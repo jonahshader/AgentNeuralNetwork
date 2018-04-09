@@ -17,6 +17,7 @@ import java.util.ArrayList;
  */
 public class GameManager {
     private int epoch = 0;
+    private long time = 0;
     private double targetFps = 144;
 
     private ArrayList<Agent> agents;
@@ -156,63 +157,14 @@ public class GameManager {
         }
 
         //Main computation
-        for (Plant plant : plants) {
-            plant.grow();
-        }
-
-        for (Spike spike : spikes) {
-            spike.run();
-        }
-
-        ArrayList<Plant> plantsToRemove = new ArrayList<>();
-        for (Plant plant : plants) {
-            if (plant.isDead()) {
-                plantsToRemove.add(plant);
+        if (drawing) {
+            run();
+        } else {
+            for (int i = 0; i < 100; i++) {
+                run();
             }
         }
-        plants.removeAll(plantsToRemove);
 
-        for (Agent agent : agents) {
-            agent.runAgent();
-        }
-
-        for (Agent agent : agents) {
-            agent.moveAgent();
-        }
-
-        ArrayList<Agent> toRemove = new ArrayList<>();
-        for (Agent agent : agents) {
-            if (agent.isDead()) {
-                toRemove.add(agent);
-            }
-        }
-        agents.removeAll(toRemove);
-
-        ArrayList<Spike> spikesToRemove = new ArrayList<>();
-        for (Spike spike : spikes) {
-            if (spike.isDead()) {
-                spikesToRemove.add(spike);
-            }
-        }
-        spikes.removeAll(spikesToRemove);
-
-        //Add plants that were created before
-        if (plantsToAdd.size() > 0) {
-            plants.addAll(plantsToAdd);
-            plantsToAdd.clear();
-        }
-        //Add agents that were created before
-        if (agentsToAdd.size() > 0) {
-            agents.addAll(agentsToAdd);
-            agentsToAdd.clear();
-        }
-        //Add spikes that were created before
-        if (spikesToAdd.size() > 0) {
-            spikes.addAll(spikesToAdd);
-            spikesToAdd.clear();
-        }
-
-        environment.calculateEnvironment(mainClass.frameCount);
 
         if (drawing) {
             if (mainClass.frameCount % (30) == 0) {
@@ -221,12 +173,10 @@ public class GameManager {
             }
         } else {
             if (mainClass.frameCount % 200 == 0) {
-                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
+                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
 //                System.out.println("FPS: " + mainClass.frameRate);
             }
         }
-
-        if (mainClass.frameCount % 20000 == 19999) epoch++;
     }
 
     public boolean isPlayingGame() {
@@ -394,6 +344,69 @@ public class GameManager {
     }
 
     public void startGame() {
+    }
 
+    //Main computation
+    private void run() {
+        if (time % 20000 == 19999) epoch++;
+
+        for (Plant plant : plants) {
+            plant.grow();
+        }
+
+        for (Spike spike : spikes) {
+            spike.run();
+        }
+
+        ArrayList<Plant> plantsToRemove = new ArrayList<>();
+        for (Plant plant : plants) {
+            if (plant.isDead()) {
+                plantsToRemove.add(plant);
+            }
+        }
+        plants.removeAll(plantsToRemove);
+
+        for (Agent agent : agents) {
+            agent.runAgent();
+        }
+
+        for (Agent agent : agents) {
+            agent.moveAgent();
+        }
+
+        ArrayList<Agent> toRemove = new ArrayList<>();
+        for (Agent agent : agents) {
+            if (agent.isDead()) {
+                toRemove.add(agent);
+            }
+        }
+        agents.removeAll(toRemove);
+
+        ArrayList<Spike> spikesToRemove = new ArrayList<>();
+        for (Spike spike : spikes) {
+            if (spike.isDead()) {
+                spikesToRemove.add(spike);
+            }
+        }
+        spikes.removeAll(spikesToRemove);
+
+        //Add plants that were created before
+        if (plantsToAdd.size() > 0) {
+            plants.addAll(plantsToAdd);
+            plantsToAdd.clear();
+        }
+        //Add agents that were created before
+        if (agentsToAdd.size() > 0) {
+            agents.addAll(agentsToAdd);
+            agentsToAdd.clear();
+        }
+        //Add spikes that were created before
+        if (spikesToAdd.size() > 0) {
+            spikes.addAll(spikesToAdd);
+            spikesToAdd.clear();
+        }
+
+        environment.calculateEnvironment(mainClass.frameCount);
+        time++;
     }
 }
