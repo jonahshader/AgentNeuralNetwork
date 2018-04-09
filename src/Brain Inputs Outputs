@@ -1,0 +1,20 @@
+List of inputs to the neural network:
+    Eyes
+        Distance
+        Color
+        Size
+
+    X, Y Location
+    Overlapping a body (could be agent or food)
+    Size
+    Energy
+    Health (maybe)
+
+
+List of outputs from the neural network:
+    Speed
+    Delta relativeAngle
+    Color (might take energy to change)
+    Eat
+    Reproduce
+    Reveal Identity
