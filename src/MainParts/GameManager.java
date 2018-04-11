@@ -92,36 +92,6 @@ public class GameManager {
     }
 
     public void draw() {
-        //Keyboard viewport control
-        if (mainClass.keyPressed) {
-            if (mainClass.key == 'a' || mainClass.key == 'A') {
-                viewportX -= 5 / viewportZoom;
-            }
-            if (mainClass.key == 'd' || mainClass.key == 'D') {
-                viewportX += 5 / viewportZoom;
-            }
-            if (mainClass.key == 's' || mainClass.key == 'S') {
-                viewportY += 5 / viewportZoom;
-            }
-            if (mainClass.key == 'w' || mainClass.key == 'W') {
-                viewportY -= 5 / viewportZoom;
-            }
-        }
-
-        if (mainClass.frameCount % 1000 == 0)
-            optimiser.runOptimiser();
-
-        if (agents.size() < Modes.getMinimumAgentCount()) {
-            if (unusedEnergy >= Modes.getMinimumStartingAgentEnergy()) {
-                agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
-                unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
-            }
-        } else if (mainClass.frameCount % 720 == 0){
-            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
-            unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
-        }
-
-
         //When drawing is enabled, draw stuff :)
         if(drawing) {
             if (mainClass.mouseButton == PConstants.CENTER && mainClass.mousePressed) {
@@ -348,6 +318,35 @@ public class GameManager {
 
     //Main computation
     private void run() {
+        //Keyboard viewport control
+        if (mainClass.keyPressed) {
+            if (mainClass.key == 'a' || mainClass.key == 'A') {
+                viewportX -= 5 / viewportZoom;
+            }
+            if (mainClass.key == 'd' || mainClass.key == 'D') {
+                viewportX += 5 / viewportZoom;
+            }
+            if (mainClass.key == 's' || mainClass.key == 'S') {
+                viewportY += 5 / viewportZoom;
+            }
+            if (mainClass.key == 'w' || mainClass.key == 'W') {
+                viewportY -= 5 / viewportZoom;
+            }
+        }
+
+        if (time % 1000 == 0)
+            optimiser.runOptimiser();
+
+        if (agents.size() < Modes.getMinimumAgentCount()) {
+            if (unusedEnergy >= Modes.getMinimumStartingAgentEnergy()) {
+                agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
+                unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
+            }
+        } else if (mainClass.frameCount % 720 == 0){
+            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
+            unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
+        }
+
         if (time % 20000 == 19999) {
             epoch++;
             double averageMutationRate = 0;
