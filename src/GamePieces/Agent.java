@@ -9,6 +9,7 @@ import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static NeuralNetStuff.NeuralNetwork.ranFlip;
 
@@ -38,14 +39,16 @@ public class Agent {
 
     final static double MIN_REPRODUCE_ENERGY = 2000;
 
+    final static Random random = new Random();
+
     //Sensor constants
-    final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 8);
-    final static int EYE_COUNT = 5;  //Must be an odd number for now
+    final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 3);
+    final static int EYE_COUNT = 3;  //Must be an odd number for now
     final static double EYE_LENGTH_SCALE = 4;
     public final static double EYE_LENGTH = 350;
-    final static int FEEDBACK_NEURONS = 6;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
-    //x, y, health, energy, diameter,
-    final static int MISC_INPUT_COUNT = 8;
+    final static int FEEDBACK_NEURONS = 0;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
+    //health, energy, diameter,
+    final static int MISC_INPUT_COUNT = 5;
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
@@ -156,7 +159,7 @@ public class Agent {
 
     public Agent(double energy, Agent parentAgent, boolean mutate, double mutationRate, boolean control, boolean spectate) {
         baby = true;
-        this.mutationRate = mutationRate;
+        this.mutationRate = mutationRate + random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
         this.energy = energy;
         this.mainProgram = parentAgent.mainProgram;
         this.game = parentAgent.game;
@@ -173,9 +176,9 @@ public class Agent {
         deltaDirection = 0;
         health = 100;
 //        System.out.println("Baby Created, mutation rate: " + mutationRate);
-        System.out.println("Baby Created");
-        if (Math.random() > 0.99)
-            brain.printDebug();
+//        System.out.println("Baby Created");
+//        if (Math.random() > 0.99)
+//            brain.printDebug();
 
         speed = parentAgent.speed;
         targetSpeed = parentAgent.targetSpeed;
@@ -486,14 +489,12 @@ public class Agent {
         for (int i = 4 * eyes.length; i < 5 * eyes.length; i++)
             brain.setInput(i, (eyes[i - (4 * eyes.length)].getItemDiameter() / 750.0) * GameManager.environment.getVisibility());
 
-        brain.setInput(5 * eyes.length, ((x / (double) Modes.getWorldWidth()) * 2) - 1.0);
-        brain.setInput(5 * eyes.length + 1, ((y / (double) Modes.getWorldHeight()) * 2) - 1.0);
-        brain.setInput(5 * eyes.length + 2, health / 100);
-        brain.setInput(5 * eyes.length + 3, energy / 1200);
-        brain.setInput(5 * eyes.length + 4, diameter / 750.0);
-//        brain.setInput(5 * eyes.length + 5, Math.random() - 0.5);
-        brain.setInput(5 * eyes.length + 6, age / 4000.0);
-        brain.setInput(5 * eyes.length + 7, colliding ? 1 : 0);
+        brain.setInput(5 * eyes.length + 0, health / 100);
+        brain.setInput(5 * eyes.length + 1, energy / 1200);
+        brain.setInput(5 * eyes.length + 2, diameter / 750.0);
+        brain.setInput(5 * eyes.length + 3, age / 4000.0);
+        brain.setInput(5 * eyes.length + 4, colliding ? 1 : 0);
+        //brain.setInput(5 * eyes.length + 5, Math.random() - 0.5);
 
         //Update brain
         brain.calculateNet();
@@ -529,8 +530,8 @@ public class Agent {
     public void reproduce() {
         if (energy >= MIN_REPRODUCE_ENERGY) {
             energy /= 3.0f;
-            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate * (1 + ranFlip(Math.random() * MUTATION_RATE_MUTATION_RATE)), false, false));
-            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate * (1 + ranFlip(Math.random() * MUTATION_RATE_MUTATION_RATE)), false, false));
+            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
+            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
 //            game.addAgentToAddQueue(new Agent(energy - 5, this, true, mutationRate, false, false));
 //            game.addAgentToAddQueue(new Agent(energy, this, false, playerControl, spectating));
 //            energy = 0;
@@ -552,5 +553,9 @@ public class Agent {
 
     public double getDirection() {
         return direction;
+    }
+
+    public double getMutationRate() {
+        return mutationRate;
     }
 }

@@ -6,6 +6,7 @@ import MainParts.Modes;
 import VisionOptimisation.VisionOptimiser;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static NeuralNetStuff.NeuralNetwork.ranRange;
 
@@ -25,6 +26,7 @@ public class Spike {
     private double[] rgb;
     private boolean dead;
 
+    final static Random random = new Random();
     AgentEvolution mainProgram;
     VisionOptimiser optimiser;
     VisionOptimiser.Section containingSection;
@@ -77,7 +79,21 @@ public class Spike {
 
     public void run() {
         if (!dead) {
-
+            //Move around randomly
+            if (Math.random() > 0.95) {
+                x += random.nextGaussian();
+                y += random.nextGaussian();
+            }
+            if (x > Modes.getWorldWidth()) {
+                x -= Modes.getWorldWidth();
+            } else if (x < 0) {
+                x += Modes.getWorldWidth();
+            }
+            if (y > Modes.getWorldHeight()) {
+                y -= Modes.getWorldHeight();
+            } else if (y < 0) {
+                y += Modes.getWorldHeight();
+            }
         }
     }
 

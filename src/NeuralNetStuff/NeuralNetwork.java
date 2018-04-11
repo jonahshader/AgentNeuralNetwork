@@ -205,8 +205,9 @@ public class NeuralNetwork {
 //                    if (Math.random() < MUTATION_CHANCE) {
 //                        System.out.print("Mutated weight " + weights[i][j]);
 //                        weights[i][j] += ranFlip(ranPow(MUTATION_POW)) * MUTATION_SCALE * mutationRate * weightMutability[i][j];
-                        weights[i][j] += random.nextGaussian() * MUTATION_SCALE * mutationRate * weightMutability[i][j];
-                        weightMutability[i][j] += ranFlip(ranPow(MUTATION_POW)) * WEIGHT_MUTABILITY_MUTATION_RATE * mutationRate;
+//                        weights[i][j] += random.nextGaussian() * MUTATION_SCALE * mutationRate * weightMutability[i][j];
+                    weights[i][j] += random.nextGaussian() * MUTATION_SCALE * mutationRate;
+                    weightMutability[i][j] += ranFlip(ranPow(MUTATION_POW)) * WEIGHT_MUTABILITY_MUTATION_RATE * mutationRate;
 //                        System.out.println(" to " + weights[i][j]);
 //                    }
                 }

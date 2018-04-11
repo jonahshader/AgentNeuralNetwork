@@ -56,7 +56,7 @@ public class GameManager {
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(0.1f); //0.6
+        Modes.setScale(20f); //0.6
         unusedEnergy = (Modes.getStartingAgentCount() * Modes.getMinimumStartingAgentEnergy()) * Modes.getStartingEnergyBoostScale();
 
         formatter = new DecimalFormat("#0.00");
@@ -348,7 +348,16 @@ public class GameManager {
 
     //Main computation
     private void run() {
-        if (time % 20000 == 19999) epoch++;
+        if (time % 20000 == 19999) {
+            epoch++;
+            double averageMutationRate = 0;
+            for (Agent agent : agents) {
+                averageMutationRate += agent.getMutationRate();
+            }
+            averageMutationRate /= agents.size();
+//            System.out.println("Average mutation rate at epoch " + epoch + " is " + averageMutationRate);
+            System.out.println(epoch + "," + averageMutationRate);
+        }
 
         for (Plant plant : plants) {
             plant.grow();
