@@ -2,6 +2,8 @@ package NeuralNetStuff;
 
 import processing.core.PApplet;
 
+import java.util.Random;
+
 /**
  * Created by loshaderj16 on 3/14/2017.
  */
@@ -13,6 +15,8 @@ public class NeuralNetwork {
     final static double MUTATION_CHANCE = 1; //0.01
 
     final static double WEIGHT_MUTABILITY_MUTATION_RATE = 0.075;
+
+    final static Random random = new Random();
 
     //Graphics constants
     final static double BRIGHTNESS_MULTIPLIER = 255;
@@ -196,14 +200,15 @@ public class NeuralNetwork {
         }
 
         public void mutateWeights(double mutationRate) {
-            for (int i = 0; i < inputs + 1; i++) { //TODO: possibly should be inputs + 1 instead of inputs. not sure if
+            for (int i = 0; i < inputs + 1; i++) {
                 for (int j = 0; j < outputs; j++) {
-                    if (Math.random() < MUTATION_CHANCE) {
+//                    if (Math.random() < MUTATION_CHANCE) {
 //                        System.out.print("Mutated weight " + weights[i][j]);
-                        weights[i][j] += ranFlip(ranPow(MUTATION_POW)) * MUTATION_SCALE * mutationRate * weightMutability[i][j];
+//                        weights[i][j] += ranFlip(ranPow(MUTATION_POW)) * MUTATION_SCALE * mutationRate * weightMutability[i][j];
+                        weights[i][j] += random.nextGaussian() * MUTATION_SCALE * mutationRate * weightMutability[i][j];
                         weightMutability[i][j] += ranFlip(ranPow(MUTATION_POW)) * WEIGHT_MUTABILITY_MUTATION_RATE * mutationRate;
 //                        System.out.println(" to " + weights[i][j]);
-                    }
+//                    }
                 }
             }
         }
