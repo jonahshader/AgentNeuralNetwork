@@ -24,7 +24,7 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 
 public class Agent {
     final static double SIZE_SCALE = 1f;
-    final static double CARNIVORE_CONSUME_RATIO = 0.8f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
+    final static double CARNIVORE_CONSUME_RATIO = 1f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
     final static double TURN_FOOD_COST = 0.005; //20
     final static double IDLE_FOOD_COST = 0.015; // 0.01
     final static double MOVE_FOOD_COST = 0.2f; // 0.03
@@ -63,6 +63,7 @@ public class Agent {
     private ArrayList<Plant> otherPlants;
     private ArrayList<Spike> otherSpikes;
     private AgentEvolution mainProgram;
+    private Agent parentAgent;
     private GameManager game;
     //Collision detection/vision stuff
     private VisionOptimiser optimiser;
@@ -87,6 +88,7 @@ public class Agent {
     private boolean baby = false;
     private boolean dead = false;
     private boolean colliding = false;
+    private boolean isAStartingAgent;
 
     //Sensor stuff
     private NeuralNetwork brain;
@@ -100,7 +102,9 @@ public class Agent {
         this.otherPlants = game.getPlants();
         this.otherSpikes = game.getSpikes();
         this.isPlayer = isPlayer;
+        parentAgent = null;
         optimiser = game.optimiser;
+        isAStartingAgent = true;
         //Brain inputs:
         /*
         0 to (EYE_COUNT - 1): eye distance
@@ -162,8 +166,10 @@ public class Agent {
         this.mutationRate = mutationRate + random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
         this.energy = energy;
         this.mainProgram = parentAgent.mainProgram;
+        this.parentAgent = parentAgent;
         this.game = parentAgent.game;
         optimiser = game.optimiser;
+        isAStartingAgent = false;
 
         brain = new NeuralNetwork(parentAgent.brain);
         if (mutate)
@@ -286,18 +292,28 @@ public class Agent {
                     }
                 }
 
+                //TODO: don't eat children
                 //Eat agents
                 for (Agent tempAgent : otherAgents) {
-                    if (tempAgent != this && !tempAgent.isDead()) {
+                    if (tempAgent != this && !tempAgent.isDead() && tempAgent.getParentAgent() != this) {
                         if (PApplet.dist((float) x, (float) y, (float) tempAgent.getX(), (float) tempAgent.getY()) < (tempAgent.getDiameter() / 2.0) + (diameter / 2.0)) {
-                            double foodObtained = tempAgent.eatMe(diameter * EAT_AGENT_ENERGY_SCALE, diameter * EAT_AGENT_EFFECTIVE_SIZE_SCALE);
-                            energy += foodObtained * CARNIVORE_CONSUME_RATIO;
-                            game.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO));
-                            colliding = true;
+                            if (tempAgent != parentAgent) {
+                                double foodObtained = tempAgent.eatMe(diameter * EAT_AGENT_ENERGY_SCALE, diameter * EAT_AGENT_EFFECTIVE_SIZE_SCALE);
+                                energy += foodObtained * CARNIVORE_CONSUME_RATIO;
+                                game.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO));
+                                colliding = true;
+                            } else { //this is yo parent. dont eat it as fast
+                                double foodObtained = tempAgent.eatMe(diameter * EAT_AGENT_ENERGY_SCALE * 0.1, diameter * EAT_AGENT_EFFECTIVE_SIZE_SCALE);
+                                energy += foodObtained * CARNIVORE_CONSUME_RATIO;
+                                game.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO));
+                                colliding = true;
+                            }
                         }
                     }
                 }
-            } else {    //If the agent isn't trying to eat, just calculate collision detection
+//            } else {    //If the agent isn't trying to eat, just calculate collision detection
+            }
+            if (true) {
                 for (Plant plant : otherPlants) {
                     if (PApplet.dist((float) x, (float) y, (float) plant.getX(), (float) plant.getY()) < (plant.getDiameter() / 2.0) + (diameter / 2.0)) {
                         colliding = true;
@@ -322,6 +338,10 @@ public class Agent {
                 }
             age++;
         }
+    }
+
+    private Agent getParentAgent() {
+        return parentAgent;
     }
 
     public void killAgent() {
@@ -529,11 +549,11 @@ public class Agent {
 
     public void reproduce() {
         if (energy >= MIN_REPRODUCE_ENERGY) {
-            energy /= 3.0f;
+            energy /= 2.0f;
             game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
-            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
-//            game.addAgentToAddQueue(new Agent(energy - 5, this, true, mutationRate, false, false));
-//            game.addAgentToAddQueue(new Agent(energy, this, false, playerControl, spectating));
+//            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
+//            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
+            System.out.println("Child created at age " + age);
 //            energy = 0;
 //            killAgent();
         }
@@ -557,5 +577,9 @@ public class Agent {
 
     public double getMutationRate() {
         return mutationRate;
+    }
+
+    public boolean isAStartingAgent() {
+        return isAStartingAgent;
     }
 }

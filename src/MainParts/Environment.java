@@ -9,7 +9,7 @@ public class Environment {
 
     float brightness = 127.5f;
 
-    public void calculateEnvironment(int rawFrameCount) {
+    public void calculateEnvironment(long rawFrameCount) {
         calculateDayTime(rawFrameCount);
     }
 
@@ -23,7 +23,7 @@ public class Environment {
 //        return 1f;
     }
 
-    private void calculateDayTime(int rawFrameCount) {
+    private void calculateDayTime(long rawFrameCount) {
         brightness = (float) ((Math.sin((rawFrameCount / DAY_NIGHT_CYCLE_LENGTH) * Math.PI) + 1.0) / 2.0);
         brightness = (float) Math.pow(brightness, 0.2);
         brightness *= MAX_BRIGHTNESS;

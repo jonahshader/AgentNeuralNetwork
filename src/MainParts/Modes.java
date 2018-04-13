@@ -8,7 +8,7 @@ package MainParts;
 public class Modes {
     //How difficult the
     public enum Mode {
-        EASY, MEDIUM, HARD
+        PLANTS, NO_PLANTS
     }
 
     public enum Food {
@@ -254,12 +254,29 @@ public class Modes {
 
     public static void setDifficultyMode(Mode mode) {
         switch (mode) {
-            case EASY:
-
+            case PLANTS:
+                startingPlantCount = 1000; //TODO: separate startingPlantCount initial value into a constant
+                break;
+            case NO_PLANTS:
+//                System.out.println(startingAgentCount);
+//                System.out.println(minimumAgentCount);
+                minimumAgentCount = startingAgentCount;
+                minimumAgentCount *= 4;
+                startingAgentCount *= 4;
+                startingPlantCount = 0;
+                break;
+            default:
+                break;
         }
     }
 
     public static void setScale(double scale) {
         Modes.scale = scale;
+    }
+
+    public static void disableSpikes() {
+//        if (disable) {
+            startingSpikeCount = 0;
+//        }
     }
 }

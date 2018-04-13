@@ -36,6 +36,7 @@ public class GameManager {
     private boolean drawingPlants = true;
     private boolean drawingBrain = false;
     private boolean drawingEyes = true;
+    private boolean drawingInitialAgents = true;
 
     private boolean drawingDebugGraphics = false;
     private boolean forceReproduce = false;
@@ -45,18 +46,19 @@ public class GameManager {
     private double viewportZoom = 1;
     private boolean playingGame;
 
+    //Stuff for data logging
+    public int deathsThisEpoch = 0;
+
     //System wide energy
     private double unusedEnergy;
 
     NumberFormat formatter;
 
-    public ArrayList<Spike> getSpikes() {
-        return spikes;
-    }
-
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(20f); //0.6
+        Modes.setScale(0.1f); //0.6
+        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
+        Modes.disableSpikes();
         unusedEnergy = (Modes.getStartingAgentCount() * Modes.getMinimumStartingAgentEnergy()) * Modes.getStartingEnergyBoostScale();
 
         formatter = new DecimalFormat("#0.00");
@@ -119,7 +121,10 @@ public class GameManager {
             }
             for (int i = 0; i < agents.size(); i++) {
                 Agent agent = agents.get(i);
-                agent.drawAgent();
+                if (drawingInitialAgents || !agent.isAStartingAgent()) {
+                    agent.drawAgent();
+                }
+
             }
             mainClass.popMatrix();
 
@@ -132,19 +137,6 @@ public class GameManager {
         } else {
             for (int i = 0; i < 100; i++) {
                 run();
-            }
-        }
-
-
-        if (drawing) {
-            if (mainClass.frameCount % (30) == 0) {
-                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
-//                System.out.println("FPS: " + mainClass.frameRate);
-            }
-        } else {
-            if (mainClass.frameCount % 200 == 0) {
-                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
-//                System.out.println("FPS: " + mainClass.frameRate);
             }
         }
     }
@@ -207,6 +199,7 @@ public class GameManager {
         if (mainClass.key == 'h' || mainClass.key == 'H') drawingEyes = !drawingEyes;
         if (mainClass.key == 'f' || mainClass.key == 'F') forceReproduce = !forceReproduce;
         if (mainClass.key == 'l' || mainClass.key == 'L') enableSpikes = !enableSpikes;
+        if (mainClass.key == 'x' || mainClass.key == 'X') drawingInitialAgents = !drawingInitialAgents;
 
         if (mainClass.key == ' ') {
             hud.setSpectatingAgent(null);
@@ -318,6 +311,18 @@ public class GameManager {
 
     //Main computation
     private void run() {
+        if (drawing) {
+            if (mainClass.frameCount % (30) == 0) {
+                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
+//                System.out.println("FPS: " + mainClass.frameRate);
+            }
+        } else {
+            if (mainClass.frameCount % 200 == 0) {
+                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
+//                System.out.println("FPS: " + mainClass.frameRate);
+            }
+        }
+
         //Keyboard viewport control
         if (mainClass.keyPressed) {
             if (mainClass.key == 'a' || mainClass.key == 'A') {
@@ -334,15 +339,14 @@ public class GameManager {
             }
         }
 
-        if (time % 1000 == 0)
+        if (time % 500 == 0)
             optimiser.runOptimiser();
 
         if (agents.size() < Modes.getMinimumAgentCount()) {
-            if (unusedEnergy >= Modes.getMinimumStartingAgentEnergy()) {
-                agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
-                unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
-            }
-        } else if (mainClass.frameCount % 720 == 0){
+            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
+//            System.out.println("Population too low; adding new agent");
+            unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
+        } else if (time % 72000 == 0){
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
         }
@@ -414,7 +418,11 @@ public class GameManager {
             spikesToAdd.clear();
         }
 
-        environment.calculateEnvironment(mainClass.frameCount);
+        environment.calculateEnvironment(time);
         time++;
+    }
+
+    public ArrayList<Spike> getSpikes() {
+        return spikes;
     }
 }
