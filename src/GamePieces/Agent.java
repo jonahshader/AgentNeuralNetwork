@@ -3,6 +3,7 @@ package GamePieces;
 import GamePieces.AgentParts.AgentEye;
 import MainParts.AgentEvolution;
 import MainParts.GameManager;
+import MainParts.GlobalRandom;
 import MainParts.Modes;
 import NeuralNetStuff.NeuralNetwork;
 import VisionOptimisation.VisionOptimiser;
@@ -24,12 +25,12 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 
 public class Agent {
     final static double SIZE_SCALE = 1f;
-    final static double CARNIVORE_CONSUME_RATIO = 1f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
-    final static double TURN_FOOD_COST = 0.005; //20
-    final static double IDLE_FOOD_COST = 0.015; // 0.01
-    final static double MOVE_FOOD_COST = 0.2f; // 0.03
+    final static double CARNIVORE_CONSUME_RATIO = 0.75f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
+    final static double TURN_FOOD_COST = 0.55; //20
+    final static double IDLE_FOOD_COST = 0.02; // 0.01
+    final static double MOVE_FOOD_COST = 0.15f; // 0.03
     final static double ENERGY_DIAMETER_SCALE = 0.01f;
-    final static double ENERGY_CONSUMPTION_SIZE_POW = 1.5f; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
+    final static double ENERGY_CONSUMPTION_SIZE_POW = 1.6f; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
     final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.2f;
     final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
     final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
@@ -39,20 +40,18 @@ public class Agent {
 
     final static double MIN_REPRODUCE_ENERGY = 2000;
 
-    final static Random random = new Random();
-
     //Sensor constants
     final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 3);
     final static int EYE_COUNT = 3;  //Must be an odd number for now
     final static double EYE_LENGTH_SCALE = 4;
     public final static double EYE_LENGTH = 350;
-    final static int FEEDBACK_NEURONS = 0;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
+    final static int FEEDBACK_NEURONS = 5;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
     //health, energy, diameter,
     final static int MISC_INPUT_COUNT = 5;
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{30};
+    private int[] hiddenLayers = new int[]{20, 20};
 
     //Player control stuff
     boolean playerControl;
@@ -163,7 +162,7 @@ public class Agent {
 
     public Agent(double energy, Agent parentAgent, boolean mutate, double mutationRate, boolean control, boolean spectate) {
         baby = true;
-        this.mutationRate = mutationRate + random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
+        this.mutationRate = mutationRate + GlobalRandom.random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
         this.energy = energy;
         this.mainProgram = parentAgent.mainProgram;
         this.parentAgent = parentAgent;
@@ -549,9 +548,9 @@ public class Agent {
 
     public void reproduce() {
         if (energy >= MIN_REPRODUCE_ENERGY) {
-            energy /= 2.0f;
+            energy /= 3.0f;
             game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
-//            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
+            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
 //            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
             System.out.println("Child created at age " + age);
 //            energy = 0;

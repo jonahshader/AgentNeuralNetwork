@@ -2,6 +2,7 @@ package GamePieces;
 
 import MainParts.AgentEvolution;
 import MainParts.GameManager;
+import MainParts.GlobalRandom;
 import MainParts.Modes;
 import VisionOptimisation.VisionOptimiser;
 
@@ -14,24 +15,23 @@ import static NeuralNetStuff.NeuralNetwork.ranRange;
  * Created by Jonah on 7/6/2017.
  */
 public class Spike {
-    final static int BASE_COLOR_RED = 230;
-    final static int BASE_COLOR_GREEN = 10;
-    final static int BASE_COLOR_BLUE = 25;
-    final static double BASE_COLOR_VARIANCE = 0.1f; //Percentage
-    final static double SIZE_VARIANCE = 0.5;
-    final static double BASE_DIAMETER = 45;
+    private final static int BASE_COLOR_RED = 230;
+    private final static int BASE_COLOR_GREEN = 10;
+    private final static int BASE_COLOR_BLUE = 25;
+    private final static double BASE_COLOR_VARIANCE = 0.1f; //Percentage
+    private final static double SIZE_VARIANCE = 0.5;
+    private final static double BASE_DIAMETER = 45;
     private double x;
     private double y;
     private double diameter;
     private double[] rgb;
     private boolean dead;
 
-    final static Random random = new Random();
-    AgentEvolution mainProgram;
-    VisionOptimiser optimiser;
-    VisionOptimiser.Section containingSection;
-    GameManager game;
-    ArrayList<Spike> otherSpikes;
+    private AgentEvolution mainProgram;
+    private VisionOptimiser optimiser;
+    private VisionOptimiser.Section containingSection;
+    private GameManager game;
+    private ArrayList<Spike> otherSpikes;
 
     public Spike(ArrayList<Spike> otherSpikes, GameManager game, AgentEvolution mainProgram) {
         this.mainProgram = mainProgram;
@@ -79,21 +79,21 @@ public class Spike {
 
     public void run() {
         if (!dead) {
-            //Move around randomly
-            if (Math.random() > 0.95) {
-                x += random.nextGaussian();
-                y += random.nextGaussian();
-            }
-            if (x > Modes.getWorldWidth()) {
-                x -= Modes.getWorldWidth();
-            } else if (x < 0) {
-                x += Modes.getWorldWidth();
-            }
-            if (y > Modes.getWorldHeight()) {
-                y -= Modes.getWorldHeight();
-            } else if (y < 0) {
-                y += Modes.getWorldHeight();
-            }
+//            //Move around randomly
+//            if (Math.random() > 0.95) {
+//                x += GlobalRandom.random.nextGaussian();
+//                y += GlobalRandom.random.nextGaussian();
+//            }
+//            if (x > Modes.getWorldWidth()) {
+//                x -= Modes.getWorldWidth();
+//            } else if (x < 0) {
+//                x += Modes.getWorldWidth();
+//            }
+//            if (y > Modes.getWorldHeight()) {
+//                y -= Modes.getWorldHeight();
+//            } else if (y < 0) {
+//                y += Modes.getWorldHeight();
+//            }
         }
     }
 

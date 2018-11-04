@@ -56,9 +56,10 @@ public class GameManager {
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(0.1f); //0.6
-        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
-        Modes.disableSpikes();
+        Modes.setScale(0.6f); //0.6
+        //uncomment for carnivore mode
+//        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
+//        Modes.disableSpikes();
         unusedEnergy = (Modes.getStartingAgentCount() * Modes.getMinimumStartingAgentEnergy()) * Modes.getStartingEnergyBoostScale();
 
         formatter = new DecimalFormat("#0.00");
@@ -339,7 +340,7 @@ public class GameManager {
             }
         }
 
-        if (time % 500 == 0)
+        if (time % 50 == 0)
             optimiser.runOptimiser();
 
         if (agents.size() < Modes.getMinimumAgentCount()) {

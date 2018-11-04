@@ -32,7 +32,7 @@ public class Neuron {
     }
 
     private double prelu(double value) {
-        return value >= 0.0 ? value : value / 50.0;
+        return value >= 0.0 ? value : value / 16.0;
     }
 
     private double rprelu(double value) {

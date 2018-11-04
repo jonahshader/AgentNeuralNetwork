@@ -11,10 +11,10 @@ public class NeuralNetwork {
     final static double INIT_WEIGHT_POW = 1;
     final static double INIT_WEIGHT_SCALE = 0.4f;
     final static double MUTATION_POW = 1;
-    final static double MUTATION_SCALE = 0.013; //0.001
+    final static double MUTATION_SCALE = 0.03; //0.013
     final static double MUTATION_CHANCE = 1; //0.01
 
-    final static double WEIGHT_MUTABILITY_MUTATION_RATE = 0.075;
+    final static double WEIGHT_MUTABILITY_MUTATION_RATE = 0.01; //0.075
 
     final static Random random = new Random();
 
@@ -211,7 +211,7 @@ public class NeuralNetwork {
         public void drawLayer(PApplet graphics, float x, float y) {
             for (int i = 0; i < inputs + 1; i++) {
                 for (int j = 0; j < outputs; j++) {
-                    if (Math.abs(weights[i][j]) > 0.5) {
+                    if (Math.abs(weights[i][j]) > 0.0) {
                         graphics.stroke((float) ((weights[i][j]) * BRIGHTNESS_MULTIPLIER), 0, (float) ((-weights[i][j]) * BRIGHTNESS_MULTIPLIER), (float) Math.abs(weights[i][j] * 255.0));
                         graphics.line(x - WIDTH_SPACING, y + (i * HEIGHT_SPACING * LAYER_HEIGHT) / inputs, x, y + j * HEIGHT_SPACING * LAYER_HEIGHT / outputs);
                     }
