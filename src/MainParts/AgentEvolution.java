@@ -8,7 +8,7 @@ import processing.event.MouseEvent;
  */
 public class AgentEvolution extends PApplet{
 
-    GameManager mainGame;
+    private GameManager mainGame;
 
     public void setup() {
         mainGame = new GameManager(this);

@@ -56,7 +56,7 @@ public class GameManager {
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(0.6f); //0.6
+        Modes.setScale(3f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();

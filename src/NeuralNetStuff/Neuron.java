@@ -13,6 +13,8 @@ public class Neuron {
     public double getOutput() {
 //        return rprelu(input);
         return prelu(input);
+//        return relu(input);
+//        return 0;
 //        return Math.tanh(input);
 //        return Math.sin(input) + input;
 //        return Math.pow(input, 2);
@@ -32,10 +34,14 @@ public class Neuron {
     }
 
     private double prelu(double value) {
-        return value >= 0.0 ? value : value / 16.0;
+        return value >= 0.0 ? value : value / 64.0;
     }
 
     private double rprelu(double value) {
         return value >= 0.0 ? value : value / (50.0 * (Math.random() + 0.5));
+    }
+
+    private double relu(double value) {
+        return value > 0 ? value : 0;
     }
 }

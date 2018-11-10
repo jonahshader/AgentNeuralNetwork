@@ -45,13 +45,13 @@ public class Agent {
     final static int EYE_COUNT = 3;  //Must be an odd number for now
     final static double EYE_LENGTH_SCALE = 4;
     public final static double EYE_LENGTH = 350;
-    final static int FEEDBACK_NEURONS = 5;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
+    final static int FEEDBACK_NEURONS = 3;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
     //health, energy, diameter,
     final static int MISC_INPUT_COUNT = 5;
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{20, 20};
+    private int[] hiddenLayers = new int[]{30};
 
     //Player control stuff
     boolean playerControl;
@@ -528,8 +528,8 @@ public class Agent {
         rgb[0] = (brain.getOutput(2)) * 255;
         rgb[1] = ((brain.getOutput(3)) * 255);
         rgb[2] = ((brain.getOutput(4)) * 255);
-        eat = brain.getOutput(5) > 0;
-        reproduce = brain.getOutput(6) > 0;
+        eat = brain.getOutput(5) > 0.0;
+        reproduce = brain.getOutput(6) > 0.0;
         //TODO: add sexual reproduction
 
         for (int i = MISC_OUTPUT_COUNT; i < MISC_OUTPUT_COUNT + FEEDBACK_NEURONS; i++) {

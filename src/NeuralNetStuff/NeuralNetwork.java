@@ -1,5 +1,6 @@
 package NeuralNetStuff;
 
+import MainParts.GlobalRandom;
 import processing.core.PApplet;
 
 import java.util.Random;
@@ -10,6 +11,7 @@ import java.util.Random;
 public class NeuralNetwork {
     final static double INIT_WEIGHT_POW = 1;
     final static double INIT_WEIGHT_SCALE = 0.4f;
+    final static double INIT_WEIGHT_ACTIVITY = 23.0;
     final static double MUTATION_POW = 1;
     final static double MUTATION_SCALE = 0.03; //0.013
     final static double MUTATION_CHANCE = 1; //0.01
@@ -87,6 +89,7 @@ public class NeuralNetwork {
             layers[i].calculate();
         }
 
+        //last layer
         for (int j = 0; j < layers[layers.length - 1].outputs; j++) {
             outputs[j] = layers[layers.length - 1].getRawOutput(j);
         }
@@ -149,7 +152,7 @@ public class NeuralNetwork {
 
             for (int i = 0; i < inputs + 1; i++) {      //Randomly set weights
                 for (int j = 0; j < outputs; j++) {
-                    weights[i][j] = ranFlip(Math.pow(Math.random(), INIT_WEIGHT_POW)) * INIT_WEIGHT_SCALE;
+                    weights[i][j] = GlobalRandom.random.nextGaussian() / Math.pow(((inputs + 1) * outputs) / INIT_WEIGHT_ACTIVITY, .5);
                     weightMutability[i][j] = 1; //Default to 1 so all weights are mutable
                 }
             }
