@@ -18,8 +18,6 @@ public class NeuralNetwork {
 
     final static double WEIGHT_MUTABILITY_MUTATION_RATE = 0.01; //0.075
 
-    final static Random random = new Random();
-
     //Graphics constants
     final static double BRIGHTNESS_MULTIPLIER = 255;
     final static int WIDTH_SPACING = 400;
@@ -103,6 +101,10 @@ public class NeuralNetwork {
         return Math.random() > 0.5 ? value : -value;
     }
 
+    /**
+     * @param value
+     * @return a randome value from -value to value
+     */
     public static double ranRange(double value) {
         return ranFlip(Math.random() * value);
     }
@@ -205,7 +207,7 @@ public class NeuralNetwork {
         public void mutateWeights(double mutationRate) {
             for (int i = 0; i < inputs + 1; i++) {
                 for (int j = 0; j < outputs; j++) {
-                    weights[i][j] += random.nextGaussian() * MUTATION_SCALE * mutationRate;
+                    weights[i][j] += GlobalRandom.random.nextGaussian() * MUTATION_SCALE * mutationRate;
                     weightMutability[i][j] += ranFlip(ranPow(MUTATION_POW)) * WEIGHT_MUTABILITY_MUTATION_RATE * mutationRate;
                 }
             }

@@ -182,8 +182,7 @@ public class Agent {
         health = 100;
 //        System.out.println("Baby Created, mutation rate: " + mutationRate);
 //        System.out.println("Baby Created");
-//        if (Math.random() > 0.99)
-//            brain.printDebug();
+//        brain.printDebug();
 
         speed = parentAgent.speed;
         targetSpeed = parentAgent.targetSpeed;
@@ -552,7 +551,7 @@ public class Agent {
             game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
             game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
 //            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
-            System.out.println("Child created at age " + age);
+//            System.out.println("Child created at age " + age);
 //            energy = 0;
 //            killAgent();
         }

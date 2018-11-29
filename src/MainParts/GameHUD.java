@@ -38,9 +38,6 @@ public class GameHUD {
                     spectatingAgent.getBrain().drawNetwork(graphics, 400, 60);
             }
         }
-        graphics.fill(80, 255, 80);
-        graphics.stroke(0, 240, 0);
-        polygon(graphics.width / 2, 30, 30, 3);  // Triangle
     }
 
     public void setSpectatingAgent(Agent spectatingAgent) {
@@ -59,13 +56,6 @@ public class GameHUD {
     }
 
     public void mousePressed() {
-        if (graphics.mouseX > (graphics.width / 2) - 30) {
-            if (graphics.mouseX < (graphics.width / 2) + 30) {
-                if (graphics.mouseY < 60) {
-                    game.startGame();
-                    System.out.println("Game started!");
-                }
-            }
-        }
+
     }
 }

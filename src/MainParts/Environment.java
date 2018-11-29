@@ -9,6 +9,11 @@ public class Environment {
 
     float brightness = 127.5f;
 
+    public Environment(long currentFrame) {
+        calculateEnvironment(currentFrame);
+    }
+
+    //may contain other enviornmental things in the future
     public void calculateEnvironment(long rawFrameCount) {
         calculateDayTime(rawFrameCount);
     }
@@ -18,9 +23,7 @@ public class Environment {
     }
 
     public float getVisibility() {
-//        System.out.println(brightness / MAX_BRIGHTNESS);
         return brightness / MAX_BRIGHTNESS;
-//        return 1f;
     }
 
     private void calculateDayTime(long rawFrameCount) {

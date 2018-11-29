@@ -18,8 +18,8 @@ public class AgentEvolution extends PApplet{
 
     public void settings() {
         size(720, 480);
-//        smooth(8);
-        noSmooth();
+        smooth(8);
+//        noSmooth();
     }
 
     public void draw() {

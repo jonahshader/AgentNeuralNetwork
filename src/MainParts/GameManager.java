@@ -32,7 +32,7 @@ public class GameManager {
     private GameHUD hud;
     private AgentEvolution mainClass;
 
-    private boolean drawing = true;
+    private boolean drawingEnabled = true;
     private boolean drawingPlants = true;
     private boolean drawingBrain = false;
     private boolean drawingEyes = true;
@@ -46,13 +46,10 @@ public class GameManager {
     private double viewportZoom = 1;
     private boolean playingGame;
 
-    //Stuff for data logging
-    public int deathsThisEpoch = 0;
-
     //System wide energy
     private double unusedEnergy;
 
-    NumberFormat formatter;
+    private NumberFormat formatter;
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
@@ -60,14 +57,20 @@ public class GameManager {
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();
+
+        //Determine initial energy the simulation will have based on the number of agents, agent starting energy, and a multiplier (energy boost scale)
         unusedEnergy = (Modes.getStartingAgentCount() * Modes.getMinimumStartingAgentEnergy()) * Modes.getStartingEnergyBoostScale();
 
+        //Init formatter (for numerical text formatting).
         formatter = new DecimalFormat("#0.00");
+        //Init HUD for displaying some data
         hud = new GameHUD(mainClass, this);
-        environment = new Environment();
-        environment.calculateEnvironment(mainClass.frameCount);
+        //Create the environment (controls day/night cycle)
+        environment = new Environment(mainClass.frameCount);
+        //Create the optimiser object
         optimiser = new VisionOptimiser(Modes.getWorldWidth(), Modes.getWorldHeight(), mainClass);
-        this.mainClass = mainClass;
+        this.mainClass = mainClass; //pass mainClass var
+        //init arraylists
         agents = new ArrayList<>();
         agentsToAdd = new ArrayList<>();
         plants = new ArrayList<>();
@@ -75,7 +78,7 @@ public class GameManager {
         spikes = new ArrayList<>();
         spikesToAdd = new ArrayList<>();
 
-
+        //spawn initial agents
         while (unusedEnergy >= Modes.getMinimumStartingAgentEnergy() + (Modes.getMinimumAgentCount() * Modes.getMinimumStartingAgentEnergy())) {
             if (agents.size() >= Modes.getStartingAgentCount())
                 break;
@@ -83,10 +86,12 @@ public class GameManager {
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
         }
 
+        //spawn initial spikes
         for (int i = 0; i < Modes.getStartingSpikeCount(); i++) {
             spikes.add(new Spike(spikes, this, mainClass));
         }
 
+        //spawn initial plants
         for (int i = 0; i < Modes.getStartingPlantCount(); i++) {
             plants.add(new Plant(plants, this, mainClass));
         }
@@ -95,51 +100,54 @@ public class GameManager {
     }
 
     public void draw() {
-        //When drawing is enabled, draw stuff :)
-        if(drawing) {
-            if (mainClass.mouseButton == PConstants.CENTER && mainClass.mousePressed) {
-                viewportX += (mainClass.pmouseX - mainClass.mouseX) / viewportZoom;
-                viewportY += (mainClass.pmouseY - mainClass.mouseY) / viewportZoom;
-            }
-
-            //Apply viewport translation
-            mainClass.pushMatrix();
-            mainClass.translate(mainClass.width / 2, mainClass.height / 2);
-            mainClass.scale((float) viewportZoom);
-            mainClass.translate( -mainClass.width / 2, -mainClass.height / 2);
-            mainClass.translate((float) -viewportX, (float) -viewportY);
-            mainClass.background(environment.getBrightness());
-            if (drawingDebugGraphics)
-                optimiser.drawDebug();
-            if (drawingPlants)
-                for (int i = 0; i < plants.size(); i++) {
-                    Plant plant = plants.get(i);
-                    plant.drawPlant();
-                }
-            for (int i = 0; i < spikes.size(); i++) {
-                Spike spike = spikes.get(i);
-                spike.drawSpike();
-            }
-            for (int i = 0; i < agents.size(); i++) {
-                Agent agent = agents.get(i);
-                if (drawingInitialAgents || !agent.isAStartingAgent()) {
-                    agent.drawAgent();
-                }
-
-            }
-            mainClass.popMatrix();
-
-            hud.drawHUD();
-        }
-
-        //Main computation
-        if (drawing) {
+        //When drawingEnabled is enabled, render and run the simulation
+        if(drawingEnabled) {
             run();
+            render();
         } else {
+            //If we are not drawing to the screen, run the simulation multiple times per frame
+            //I do this because rendering a blank frame still takes resources, so now I am only
+            //rendering a blank frame every 100th tick of the simulation, saving resources
             for (int i = 0; i < 100; i++) {
                 run();
             }
         }
+    }
+
+    private void render() {
+        if (mainClass.mouseButton == PConstants.CENTER && mainClass.mousePressed) {
+            viewportX += (mainClass.pmouseX - mainClass.mouseX) / viewportZoom;
+            viewportY += (mainClass.pmouseY - mainClass.mouseY) / viewportZoom;
+        }
+
+        //Apply viewport translation
+        mainClass.pushMatrix();
+        mainClass.translate(mainClass.width / 2, mainClass.height / 2);
+        mainClass.scale((float) viewportZoom);
+        mainClass.translate( -mainClass.width / 2, -mainClass.height / 2);
+        mainClass.translate((float) -viewportX, (float) -viewportY);
+        mainClass.background(environment.getBrightness());
+        if (drawingDebugGraphics)
+            optimiser.drawDebug();
+        if (drawingPlants)
+            for (int i = 0; i < plants.size(); i++) {
+                Plant plant = plants.get(i);
+                plant.drawPlant();
+            }
+        for (int i = 0; i < spikes.size(); i++) {
+            Spike spike = spikes.get(i);
+            spike.drawSpike();
+        }
+        for (int i = 0; i < agents.size(); i++) {
+            Agent agent = agents.get(i);
+            if (drawingInitialAgents || !agent.isAStartingAgent()) {
+                agent.drawAgent();
+            }
+
+        }
+        mainClass.popMatrix();
+
+        hud.drawHUD();
     }
 
     public boolean isPlayingGame() {
@@ -147,7 +155,7 @@ public class GameManager {
     }
 
     public void mousePressed() {
-        if (drawing) {                             //Only handle these mouse presses when you can see what you are clicking!
+        if (drawingEnabled) {                             //Only handle these mouse presses when you can see what you are clicking!
             hud.mousePressed();
             if (mainClass.mouseButton == PConstants.LEFT) {
                 for (Agent agent : agents) {
@@ -183,8 +191,8 @@ public class GameManager {
     }
 
     public void keyPressed() {
-        if (mainClass.key == 'o' || mainClass.key == 'O') drawing = !drawing;
-        if (drawing) {
+        if (mainClass.key == 'o' || mainClass.key == 'O') drawingEnabled = !drawingEnabled;
+        if (drawingEnabled) {
             mainClass.frameRate((float) targetFps);
         } else {
             mainClass.frameRate(9999999);
@@ -312,15 +320,13 @@ public class GameManager {
 
     //Main computation
     private void run() {
-        if (drawing) {
+        if (drawingEnabled) {
             if (mainClass.frameCount % (30) == 0) {
                 mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
-//                System.out.println("FPS: " + mainClass.frameRate);
             }
         } else {
             if (mainClass.frameCount % 200 == 0) {
                 mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
-//                System.out.println("FPS: " + mainClass.frameRate);
             }
         }
 
@@ -343,15 +349,17 @@ public class GameManager {
         if (time % 50 == 0)
             optimiser.runOptimiser();
 
+        //if there are too few agents in the simulation, spawn more
         if (agents.size() < Modes.getMinimumAgentCount()) {
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
 //            System.out.println("Population too low; adding new agent");
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
-        } else if (time % 72000 == 0){
+        } else if (time % 72000 == 0){ //also spawn one periodically to add genetic variance to the simulation
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
         }
 
+        //increment epoch
         if (time % 20000 == 19999) {
             epoch++;
             double averageMutationRate = 0;

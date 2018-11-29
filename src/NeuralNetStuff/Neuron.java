@@ -12,8 +12,8 @@ public class Neuron {
 
     public double getOutput() {
 //        return rprelu(input);
-        return prelu(input);
-//        return relu(input);
+//        return prelu(input);
+        return relu(input);
 //        return 0;
 //        return Math.tanh(input);
 //        return Math.sin(input) + input;
