@@ -416,6 +416,10 @@ public class Agent {
 
     private void idleEnergy() {
         double reduction = IDLE_FOOD_COST + (energy / 20000);
+        manipulateEnergy(reduction);
+    }
+
+    private void manipulateEnergy(double reduction) {
         if (energy - reduction >= 0) {
             energy -= reduction;
             game.addEnergy(reduction);
@@ -440,14 +444,7 @@ public class Agent {
 
     private void moveUseEnergy() {
         double energyReduction = Math.pow(((Math.abs(speed) * MOVE_FOOD_COST) + (Math.abs(deltaDirection) * TURN_FOOD_COST)) * Math.pow(diameter * ENERGY_DIAMETER_SCALE, ENERGY_CONSUMPTION_SIZE_POW), ENERGY_CONSUMPTION_OVERALL_POW);
-        if (energy - energyReduction >= 0) {
-            energy -= energyReduction;
-            game.addEnergy(energyReduction);
-        } else {
-            game.addEnergy(energy);
-            energy = 0;
-            killAgent();
-        }
+        manipulateEnergy(energyReduction);
     }
 
     //Should be called after agent moves

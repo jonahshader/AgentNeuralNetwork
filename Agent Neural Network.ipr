@@ -5,12 +5,13 @@
       <output-path>$PROJECT_DIR$/out/artifacts/AgentNeuralNetwork_jar</output-path>
       <root id="archive" name="AgentNeuralNetwork.jar">
         <element id="module-output" name="AgentNeuralNetwork" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Libraries/Processing Libs/core.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Libraries/Processing Libs/gluegen-rt.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Libraries/Processing Libs/jogl-all.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="G:/../Libraries/Processing Libs/core.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="G:/../Libraries/Processing Libs/gluegen-rt.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="G:/../Libraries/Processing Libs/jogl-all.jar" path-in-jar="/" />
       </root>
     </artifact>
   </component>
+  <component name="Encoding" addBOMForNewFiles="with NO BOM" />
   <component name="GradleLocalSettings">
     <option name="modificationStamps">
       <map>
@@ -158,7 +159,7 @@
       <module fileurl="file://$PROJECT_DIR$/AgentNeuralNetwork.iml" filepath="$PROJECT_DIR$/AgentNeuralNetwork.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_10" default="true" project-jdk-name="10" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
@@ -167,9 +168,9 @@
   <component name="libraryTable">
     <library name="core">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../../../../Libraries/Processing Libs/core.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../../../Libraries/Processing Libs/gluegen-rt.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../../../../Libraries/Processing Libs/jogl-all.jar!/" />
+        <root url="jar://G:/Documents/OneDrive Stuff/OneDrive - Lake Orion Community Schools/Libraries/Processing Libs/core.jar!/" />
+        <root url="jar://G:/Documents/OneDrive Stuff/OneDrive - Lake Orion Community Schools/Libraries/Processing Libs/gluegen-rt.jar!/" />
+        <root url="jar://G:/Documents/OneDrive Stuff/OneDrive - Lake Orion Community Schools/Libraries/Processing Libs/jogl-all.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
