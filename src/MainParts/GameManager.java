@@ -48,13 +48,13 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
     private boolean playingGame;
 
     //System wide energy
-    private double unusedEnergy;
+    private static double unusedEnergy;
 
     private NumberFormat formatter;
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(3f); //0.6
+        Modes.setScale(2f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();
@@ -221,10 +221,11 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
         }
     }
 
-    public void addEnergy(double addedEnergy) {
+    public static synchronized void addEnergy(double addedEnergy) {
         unusedEnergy += addedEnergy;
     }
-
+    // takes and returns the desired food amount from the system.
+    // if there is not enough food, it will return as much as possible until it hits 0.
     public double takeEnergy(double desiredEnergy) {
         if (unusedEnergy - desiredEnergy > 0) {
             unusedEnergy -= desiredEnergy;
@@ -369,10 +370,10 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
             System.out.println(epoch + "," + averageMutationRate);
         }
 
-        plants.parallelStream().forEach(Plant::grow);
-//        for (Plant plant : plants) {
-//            plant.grow();
-//        }
+//        plants.parallelStream().forEach(Plant::grow);
+        for (Plant plant : plants) {
+            plant.grow();
+        }
 
         for (Spike spike : spikes) {
             spike.run();
@@ -390,7 +391,6 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
         for (Agent agent : agents) {
             agent.runAgent();
         }
-
         agents.parallelStream().forEach(Agent::moveAgent);
 //        agents.forEach(Agent::moveAgent);
 //        for (Agent agent : agents) {
@@ -431,6 +431,19 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
 
         environment.calculateEnvironment(time);
         time++;
+    }
+
+    // returns total energy in the system
+    public double calculateTotalEnergy() {
+        double totalEnergy = unusedEnergy;
+        for (Agent agent : agents) {
+            totalEnergy += agent.getEnergy();
+        }
+        for (Plant plant : plants) {
+            totalEnergy += plant.getFood();
+        }
+
+        return totalEnergy;
     }
 
     public ArrayList<Spike> getSpikes() {

@@ -122,18 +122,15 @@ public class Plant {
 
     public void grow() {
         if (!dead) {
-            double pFood = food;
-            food += growRate;
-            food *= 0.9993;
+            double newFood = food;
+            newFood += growRate;
+            newFood *= 0.9993;
+//            if (game.getAgents().size() < Modes.getMinimumAgentCount()) {
+//                 desiredFood = 0;
+//            }
 
-            double desiredFood;
-            desiredFood = food - pFood;
-            if (game.getAgents().size() < Modes.getMinimumAgentCount()) {
-                 desiredFood = 0;
-            }
-
-            double foodGain = game.takeEnergy(desiredFood);
-            food = pFood + foodGain;
+            double foodGain = game.takeEnergy(newFood - food);
+            food += foodGain;
             updateDiameter();
         }
     }

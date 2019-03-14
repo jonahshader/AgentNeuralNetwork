@@ -10,7 +10,6 @@ import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import static NeuralNetStuff.NeuralNetwork.ranFlip;
 
@@ -25,13 +24,13 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 
 public class Agent {
     final static double SIZE_SCALE = 1f;
-    final static double CARNIVORE_CONSUME_RATIO = 0.75f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
+    final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
     final static double TURN_FOOD_COST = 0.55; //20
     final static double IDLE_FOOD_COST = 0.02; // 0.01
     final static double MOVE_FOOD_COST = 0.15f; // 0.03
     final static double ENERGY_DIAMETER_SCALE = 0.01f;
     final static double ENERGY_CONSUMPTION_SIZE_POW = 1.6f; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
-    final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.2f;
+    final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.0f;
     final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
     final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
     final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 1.1f;
@@ -51,7 +50,7 @@ public class Agent {
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{50, 50};
+    private int[] hiddenLayers = new int[]{50};
 
     //Player control stuff
     boolean playerControl;
@@ -416,10 +415,10 @@ public class Agent {
 
     private void idleEnergy() {
         double reduction = IDLE_FOOD_COST + (energy / 20000);
-        manipulateEnergy(reduction);
+        reduceEnergy(reduction);
     }
 
-    private void manipulateEnergy(double reduction) {
+    private void reduceEnergy(double reduction) {
         if (energy - reduction >= 0) {
             energy -= reduction;
             game.addEnergy(reduction);
@@ -444,7 +443,7 @@ public class Agent {
 
     private void moveUseEnergy() {
         double energyReduction = Math.pow(((Math.abs(speed) * MOVE_FOOD_COST) + (Math.abs(deltaDirection) * TURN_FOOD_COST)) * Math.pow(diameter * ENERGY_DIAMETER_SCALE, ENERGY_CONSUMPTION_SIZE_POW), ENERGY_CONSUMPTION_OVERALL_POW);
-        manipulateEnergy(energyReduction);
+        reduceEnergy(energyReduction);
     }
 
     //Should be called after agent moves
