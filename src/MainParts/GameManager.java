@@ -130,22 +130,19 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
         mainClass.background(environment.getBrightness());
         if (drawingDebugGraphics)
             optimiser.drawDebug();
-        if (drawingPlants)
-            for (int i = 0; i < plants.size(); i++) {
-                Plant plant = plants.get(i);
-                plant.drawPlant();
-            }
-        for (int i = 0; i < spikes.size(); i++) {
-            Spike spike = spikes.get(i);
-            spike.drawSpike();
-        }
-        for (int i = 0; i < agents.size(); i++) {
-            Agent agent = agents.get(i);
-            if (drawingInitialAgents || !agent.isAStartingAgent()) {
-                agent.drawAgent();
-            }
 
+        if (drawingPlants) {
+            plants.forEach(Plant::drawPlant);
         }
+
+        spikes.forEach(Spike::drawSpike);
+
+        if (drawingInitialAgents) {
+            agents.forEach(Agent::drawAgent);
+        } else {
+            agents.stream().filter(agent -> !agent.isAStartingAgent()).forEach(Agent::drawAgent);
+        }
+
         mainClass.popMatrix();
 
         hud.drawHUD();
@@ -372,9 +369,10 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
             System.out.println(epoch + "," + averageMutationRate);
         }
 
-        for (Plant plant : plants) {
-            plant.grow();
-        }
+        plants.parallelStream().forEach(Plant::grow);
+//        for (Plant plant : plants) {
+//            plant.grow();
+//        }
 
         for (Spike spike : spikes) {
             spike.run();
@@ -388,6 +386,7 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
         }
         plants.removeAll(plantsToRemove);
 
+//        agents.parallelStream().forEach(Agent::runAgent);
         for (Agent agent : agents) {
             agent.runAgent();
         }
