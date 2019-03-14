@@ -25,9 +25,9 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 public class Agent {
     final static double SIZE_SCALE = 1f;
     final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
-    final static double TURN_FOOD_COST = 0.55; //20
-    final static double IDLE_FOOD_COST = 0.02; // 0.01
-    final static double MOVE_FOOD_COST = 0.15f; // 0.03
+    final static double TURN_FOOD_COST = 0.8; //20
+    final static double IDLE_FOOD_COST = 0.1; // 0.01
+    final static double MOVE_FOOD_COST = 0.1f; // 0.03
     final static double ENERGY_DIAMETER_SCALE = 0.01f;
     final static double ENERGY_CONSUMPTION_SIZE_POW = 1.6f; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
     final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.0f;
@@ -50,7 +50,7 @@ public class Agent {
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{50};
+    private int[] hiddenLayers = new int[]{150};
 
     //Player control stuff
     boolean playerControl;
@@ -240,8 +240,7 @@ public class Agent {
             while (y < 0) y += Modes.getWorldHeight();
             while (y > Modes.getWorldHeight() - 1) y -= Modes.getWorldHeight();
 
-            moveUseEnergy();
-            idleEnergy();
+            expendEnergy();
             checkDead();
 
             if (playerControl || spectating) {
@@ -297,12 +296,12 @@ public class Agent {
                             if (tempAgent != parentAgent) {
                                 double foodObtained = tempAgent.eatMe(diameter * EAT_AGENT_ENERGY_SCALE, diameter * EAT_AGENT_EFFECTIVE_SIZE_SCALE);
                                 energy += foodObtained * CARNIVORE_CONSUME_RATIO;
-                                game.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO));
+                                GameManager.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO), game);
                                 colliding = true;
                             } else { //this is yo parent. dont eat it as fast
                                 double foodObtained = tempAgent.eatMe(diameter * EAT_AGENT_ENERGY_SCALE * 0.1, diameter * EAT_AGENT_EFFECTIVE_SIZE_SCALE);
                                 energy += foodObtained * CARNIVORE_CONSUME_RATIO;
-                                game.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO));
+                                GameManager.addEnergy(foodObtained * (1.0f - CARNIVORE_CONSUME_RATIO), game);
                                 colliding = true;
                             }
                         }
@@ -344,7 +343,7 @@ public class Agent {
     public void killAgent() {
         dead = true;
         if (energy > 0) {
-            game.addEnergy(energy);
+            GameManager.addEnergy(energy, game);
             System.out.println("Agent killed with excess energy: " + energy);
             energy = 0;
         }
@@ -413,17 +412,49 @@ public class Agent {
         diameter = (2.0 * Math.sqrt(energy * SIZE_SCALE / Math.PI));
     }
 
-    private void idleEnergy() {
-        double reduction = IDLE_FOOD_COST + (energy / 20000);
-        reduceEnergy(reduction);
+    private void expendEnergy() {
+        reduceEnergy(calculateTotalEnergy());
+    }
+
+    public double calculateTotalEnergy() {
+        return calculateTotalEnergy(false);
+    }
+
+    public double calculateTotalEnergy(boolean print) {
+        double energyConsumptionMultiplier = calculateEnergyConsumptionMultiplier();
+
+        double idleEnergy = calculateIdleEnergy();
+
+        double moveEnergy = calculateMoveEnergy() * energyConsumptionMultiplier;
+        double turnEnergy = calculateTurnEnergy() * energyConsumptionMultiplier;
+        if (print)
+            System.out.println("Agent idle, move, turn energy: " + idleEnergy + " " + moveEnergy + " " + turnEnergy);
+        return idleEnergy + moveEnergy + turnEnergy;
+    }
+
+    public double calculateIdleEnergy() {
+        return IDLE_FOOD_COST;
+    }
+
+    public double calculateMoveEnergy() {
+        return Math.abs(speed) * MOVE_FOOD_COST;
+    }
+
+    public double calculateTurnEnergy() {
+        return Math.abs(deltaDirection) * TURN_FOOD_COST;
+    }
+
+    // multiplier is not applied to idle energy
+    public double calculateEnergyConsumptionMultiplier() {
+        return Math.pow(diameter * ENERGY_DIAMETER_SCALE, ENERGY_CONSUMPTION_SIZE_POW);
     }
 
     private void reduceEnergy(double reduction) {
         if (energy - reduction >= 0) {
             energy -= reduction;
-            game.addEnergy(reduction);
+            GameManager.addEnergy(reduction, game);
         } else {
-            game.addEnergy(energy);
+            GameManager.addEnergy(energy, game);
             energy = 0;
             killAgent();
         }
@@ -435,15 +466,10 @@ public class Agent {
         }
 
         if (health <= 0) {
-            game.addEnergy(energy);
+            GameManager.addEnergy(energy, game);
             energy = 0;
             killAgent();
         }
-    }
-
-    private void moveUseEnergy() {
-        double energyReduction = Math.pow(((Math.abs(speed) * MOVE_FOOD_COST) + (Math.abs(deltaDirection) * TURN_FOOD_COST)) * Math.pow(diameter * ENERGY_DIAMETER_SCALE, ENERGY_CONSUMPTION_SIZE_POW), ENERGY_CONSUMPTION_OVERALL_POW);
-        reduceEnergy(energyReduction);
     }
 
     //Should be called after agent moves

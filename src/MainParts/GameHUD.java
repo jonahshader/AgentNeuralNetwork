@@ -38,6 +38,7 @@ public class GameHUD {
             } else {
                 if (game.isDrawingBrain())
                     spectatingAgent.getBrain().drawNetwork(graphics, 400, 60);
+                spectatingAgent.calculateTotalEnergy(true);
             }
         }
     }

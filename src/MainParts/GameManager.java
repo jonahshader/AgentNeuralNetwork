@@ -48,7 +48,7 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
     private boolean playingGame;
 
     //System wide energy
-    private static double unusedEnergy;
+    private double unusedEnergy;
 
     private NumberFormat formatter;
 
@@ -221,8 +221,8 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
         }
     }
 
-    public static synchronized void addEnergy(double addedEnergy) {
-        unusedEnergy += addedEnergy;
+    public static synchronized void addEnergy(double addedEnergy, GameManager gmInstance) {
+        gmInstance.unusedEnergy += addedEnergy;
     }
     // takes and returns the desired food amount from the system.
     // if there is not enough food, it will return as much as possible until it hits 0.
