@@ -8,6 +8,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.event.MouseEvent;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by Jonah on 3/26/2017.
  */
-public class GameManager {
+public class GameManager implements Serializable { //TODO: where i left off, make everything serializable so that i can implement saving and loading sims
     private int epoch = 0;
     private long time = 0;
     private double targetFps = 144;
@@ -325,9 +326,9 @@ public class GameManager {
                 mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
             }
         } else {
-            if (mainClass.frameCount % 200 == 0) {
+//            if (mainClass.frameCount % 200 == 0) {
                 mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
-            }
+//            }
         }
 
         //Keyboard viewport control
@@ -391,9 +392,11 @@ public class GameManager {
             agent.runAgent();
         }
 
-        for (Agent agent : agents) {
-            agent.moveAgent();
-        }
+        agents.parallelStream().forEach(Agent::moveAgent);
+//        agents.forEach(Agent::moveAgent);
+//        for (Agent agent : agents) {
+//            agent.moveAgent();
+//        }
 
         ArrayList<Agent> toRemove = new ArrayList<>();
         for (Agent agent : agents) {

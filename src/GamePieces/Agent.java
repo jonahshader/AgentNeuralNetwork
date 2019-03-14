@@ -51,7 +51,7 @@ public class Agent {
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{30};
+    private int[] hiddenLayers = new int[]{50, 50};
 
     //Player control stuff
     boolean playerControl;
