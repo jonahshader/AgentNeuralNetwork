@@ -9,6 +9,7 @@ import NeuralNetStuff.NeuralNetwork;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static NeuralNetStuff.NeuralNetwork.ranFlip;
@@ -22,7 +23,7 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 //the agent can have as many feeders as it wants, but it takes energy to have them
 //genetic mutation can affect the location and count of these feeders
 
-public class Agent {
+public class Agent implements Serializable {
     final static double SIZE_SCALE = 1f;
     final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
     final static double TURN_FOOD_COST = 0.8; //20

@@ -9,6 +9,7 @@ import MainParts.GameManager;
 import processing.core.PApplet;
 
 import java.awt.geom.Line2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static GamePieces.Agent.EYE_LENGTH;
@@ -16,17 +17,17 @@ import static GamePieces.Agent.EYE_LENGTH;
 /**
  * Created by Jonah on 3/28/2017.
  */
-public class AgentEye {
-    Agent parentAgent;
-    Environment env;
-    Line2D eyeLine;
-    GameManager game;
-    double relativeAngle;    //Angle difference from center line
+public class AgentEye implements Serializable {
+    private Agent parentAgent;
+    private Environment env;
+    private Line2D eyeLine;
+    private GameManager game;
+    private double relativeAngle;    //Angle difference from center line
 
     //Outputs
-    double[] itemRgbData;  //red, green, blue in the range 0 - 255
-    double itemDistance;
-    double itemDiameter;
+    private double[] itemRgbData;  //red, green, blue in the range 0 - 255
+    private double itemDistance;
+    private double itemDiameter;
 
     public AgentEye(Agent parentAgent, double relativeAngle, GameManager game) {
         this.parentAgent = parentAgent;

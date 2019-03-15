@@ -1,9 +1,11 @@
 package MainParts;
 
+import java.io.Serializable;
+
 /**
  * Created by Jonah on 4/7/2017.
  */
-public class Environment {
+public class Environment implements Serializable {
     public final static boolean DAY_NIGHT_CYCLE_ENABLED = false;
     public final static float DAY_NIGHT_CYCLE_LENGTH = 10000.0f; //10000
     public final static float MAX_BRIGHTNESS = 180f;

@@ -1,9 +1,11 @@
 package NeuralNetStuff;
 
+import java.io.Serializable;
+
 /**
  * Created by Jonah on 3/27/2017.
  */
-public class Neuron {
+public class Neuron implements Serializable {
     private double input;
 
     public Neuron(double input) {

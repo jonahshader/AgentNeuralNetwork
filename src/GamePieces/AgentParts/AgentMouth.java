@@ -3,10 +3,14 @@ package GamePieces.AgentParts;
 import GamePieces.Agent;
 import MainParts.Environment;
 
+import java.io.Serializable;
+
 /**
  * Created by Jonah on 5/13/2017.
  */
-public class AgentMouth {
+
+//TODO: finish & implement this
+public class AgentMouth implements Serializable {
     Agent parentAgent;
     Environment env;
     double diameter;

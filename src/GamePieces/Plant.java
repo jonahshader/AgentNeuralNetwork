@@ -6,6 +6,7 @@ import MainParts.Modes;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 
 //TODO: make the plants produce offsprings with mutated colors. brighter colors grow faster. 255, 255, 255 would grow at 100%. 0, 0, 0 would grow at 0% (and should be killed immediately)
 //This is just food for the agents, nothing else
-public class Plant {
+public class Plant implements Serializable {
     final static int BASE_COLOR_RED = 40;
     final static int BASE_COLOR_GREEN = 220;
     final static int BASE_COLOR_BLUE = 25;

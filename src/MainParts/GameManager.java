@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by Jonah on 3/26/2017.
  */
-public class GameManager implements Serializable { //TODO: where i left off, make everything serializable so that i can implement saving and loading sims
+public class GameManager implements Serializable {
     private int epoch = 0;
     private long time = 0;
     private double targetFps = 144;
@@ -54,7 +54,7 @@ public class GameManager implements Serializable { //TODO: where i left off, mak
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(2f); //0.6
+        Modes.setScale(6f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();

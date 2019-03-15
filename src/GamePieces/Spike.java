@@ -6,6 +6,7 @@ import MainParts.GlobalRandom;
 import MainParts.Modes;
 import VisionOptimisation.VisionOptimiser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ import static NeuralNetStuff.NeuralNetwork.ranRange;
 /**
  * Created by Jonah on 7/6/2017.
  */
-public class Spike {
+public class Spike implements Serializable {
     private final static int BASE_COLOR_RED = 230;
     private final static int BASE_COLOR_GREEN = 10;
     private final static int BASE_COLOR_BLUE = 25;

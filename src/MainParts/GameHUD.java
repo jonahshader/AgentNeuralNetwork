@@ -3,10 +3,12 @@ package MainParts;
 import GamePieces.Agent;
 import processing.core.PApplet;
 
+import java.io.Serializable;
+
 /**
  * Created by Jonah on 3/27/2017.
  */
-public class GameHUD {
+public class GameHUD implements Serializable {
     final static float Y_OFFSET = 32;
     AgentEvolution graphics;
     GameManager game;

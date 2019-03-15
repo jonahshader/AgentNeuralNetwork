@@ -3,12 +3,13 @@ package NeuralNetStuff;
 import MainParts.GlobalRandom;
 import processing.core.PApplet;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
  * Created by loshaderj16 on 3/14/2017.
  */
-public class NeuralNetwork {
+public class NeuralNetwork implements Serializable {
     final static double INIT_WEIGHT_POW = 1;
     final static double INIT_WEIGHT_SCALE = 0.4f;
     final static double INIT_WEIGHT_ACTIVITY = 23.0;
@@ -133,7 +134,7 @@ public class NeuralNetwork {
         }
     }
 
-    class Layer{
+    class Layer implements Serializable {
         //a layer contains weights and output neurons.
         int inputs, outputs;
         double[][] weights; //1st [] inputs, 2nd [] outputs (when used in a for loop)

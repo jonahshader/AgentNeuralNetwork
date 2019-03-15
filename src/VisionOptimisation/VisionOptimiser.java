@@ -5,6 +5,7 @@ import GamePieces.Plant;
 import GamePieces.Spike;
 import processing.core.PApplet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -14,7 +15,7 @@ import static processing.core.PConstants.CORNER;
  * Created by Jonah on 3/26/2017.
  */
 //TODO: rewrite entire vision optimiser so that the agents and plants decide what section they are in.
-public class VisionOptimiser {
+public class VisionOptimiser implements Serializable {
     final static int SECTION_SIZE = 350;///256
     final static int SECTION_VIEW_RANGE = 1; // additional sections in all directions the content can react to. should be at least 1
     int worldWidth;

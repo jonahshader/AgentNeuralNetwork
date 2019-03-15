@@ -1,9 +1,11 @@
 package VisionOptimisation;
 
+import java.io.Serializable;
+
 /**
  * Created by Jonah on 3/18/2017.
  */
-public class Rectangle {
+public class Rectangle implements Serializable {
     //X, Y is a corner, not in the center (which corner depends on how you use this)
     private int x, y, width, height;
 
