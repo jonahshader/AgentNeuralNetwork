@@ -47,7 +47,7 @@ public class Agent implements Serializable {
     public final static double EYE_LENGTH = 350;
     final static int FEEDBACK_NEURONS = 3;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
     //health, energy, diameter,
-    final static int MISC_INPUT_COUNT = 5;
+    final static int MISC_INPUT_COUNT = 7;
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
@@ -70,7 +70,7 @@ public class Agent implements Serializable {
     private int sectionX, sectionY;
     private double x;
     private double y;
-    private double direction;
+    private double direction; // in rads
     private double deltaDirection;
     private double pDirection;
     private double speed;
@@ -535,6 +535,8 @@ public class Agent implements Serializable {
         brain.setInput(5 * eyes.length + 2, diameter / 750.0);
         brain.setInput(5 * eyes.length + 3, age / 4000.0);
         brain.setInput(5 * eyes.length + 4, colliding ? 1 : 0);
+        brain.setInput(5 * eyes.length + 5, Math.cos(direction));
+        brain.setInput(5 * eyes.length + 6, Math.sin(direction));
         //brain.setInput(5 * eyes.length + 5, Math.random() - 0.5);
 
         //Update brain
