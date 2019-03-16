@@ -54,7 +54,7 @@ public class GameManager implements Serializable {
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(1.0f); //0.6
+        Modes.setScale(5.0f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();

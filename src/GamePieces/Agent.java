@@ -51,7 +51,7 @@ public class Agent implements Serializable {
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{150};
+    private int[] hiddenLayers = new int[]{35, 25};
 
     //Player control stuff
     boolean playerControl;
