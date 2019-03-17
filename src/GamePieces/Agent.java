@@ -41,8 +41,8 @@ public class Agent implements Serializable {
     public final static double MIN_REPRODUCE_ENERGY = 2000;
 
     //Sensor constants
-    final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 3);
-    final static int EYE_COUNT = 5;  //Must be an odd number for now
+    final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 4);
+    final static int EYE_COUNT = 1;  //Must be an odd number for now
     final static double EYE_LENGTH_SCALE = 4;
     public final static double EYE_LENGTH = 350;
     final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
@@ -516,7 +516,7 @@ public class Agent implements Serializable {
 
         //Send data to brain
         for (int i = 0; i < eyes.length; i++)
-            brain.setInput(i, Math.pow(Math.max(((EYE_LENGTH - eyes[i].getItemDistance()) / EYE_LENGTH) * GameManager.environment.getVisibility(), 0), 0.3 * 5));
+            brain.setInput(i, Math.pow(Math.max(((EYE_LENGTH - eyes[i].getItemDistance()) / EYE_LENGTH) * GameManager.environment.getVisibility(), 0), 1.0));
 //            brain.setInput(i, 500 / (eyes[i].getItemDistance()) + 50);
         for (int i = eyes.length; i < 2 * eyes.length; i++)
             brain.setInput(i, Math.max(0, Math.min(1, eyes[i - eyes.length].getItemRgbData()[0] / 255.0)) * GameManager.environment.getVisibility() * 5);

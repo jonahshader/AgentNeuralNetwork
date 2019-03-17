@@ -8,9 +8,9 @@ import java.io.Serializable;
 public class Environment implements Serializable {
     public final static boolean DAY_NIGHT_CYCLE_ENABLED = false;
     public final static float DAY_NIGHT_CYCLE_LENGTH = 10000.0f; //10000
-    public final static float MAX_BRIGHTNESS = 180f;
+    public final static float MAX_BRIGHTNESS = 0.1f;
 
-    float brightness = 127.5f;
+    float brightness;
 
     public Environment(long currentFrame) {
         calculateEnvironment(currentFrame);

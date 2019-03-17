@@ -135,6 +135,7 @@ public class AgentEye implements Serializable {
     }
 
     public double getItemDiameter() {
+//        System.out.println("diameter: " + itemDiameter);
         return itemDiameter;
     }
 
