@@ -1,10 +1,13 @@
 package MainParts;
 
+import GamePieces.Agent;
+
 /**
  * Created by Jonah on 4/9/2017.
  */
 
 //TODO: finish this
+//TODO: this was a bad idea. butcher almost everything in here
 public class Modes {
     //How difficult the
     public enum Mode {
@@ -20,12 +23,12 @@ public class Modes {
     //GameManager parameters
     private static int worldWidth = 15000;
     private static int worldHeight = 12500;
-    private static int startingAgentCount = 300;
+    private static int startingAgentCount = 750;
     private static int startingPlantCount = 1000;
     private static int startingSpikeCount = 500;
     private static int minimumAgentCount = 250;
-    private static double minimumStartingAgentEnergy = 1300f;
-    private static double startingEnergyBoostScale = 2.5f;
+    private static double minimumStartingAgentEnergy = 1200f;
+    private static double startingEnergyBoostScale = (Agent.MIN_REPRODUCE_ENERGY / minimumStartingAgentEnergy) * 0.5;
 
     //Agent parameters
     private static double agentSizeScale = 1f;

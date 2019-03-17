@@ -38,20 +38,20 @@ public class Agent implements Serializable {
 
     final static double MUTATION_RATE_MUTATION_RATE = 0.015; // The mutation rate for the mutation rate (multiplier). Applies to entire neural network
 
-    final static double MIN_REPRODUCE_ENERGY = 2000;
+    public final static double MIN_REPRODUCE_ENERGY = 2000;
 
     //Sensor constants
     final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 3);
-    final static int EYE_COUNT = 3;  //Must be an odd number for now
+    final static int EYE_COUNT = 5;  //Must be an odd number for now
     final static double EYE_LENGTH_SCALE = 4;
     public final static double EYE_LENGTH = 350;
-    final static int FEEDBACK_NEURONS = 3;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
-    //health, energy, diameter,
+    final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
+    //health, energy, diameter, x, y, cos, sin
     final static int MISC_INPUT_COUNT = 7;
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
-    private int[] hiddenLayers = new int[]{35, 25};
+    private int[] hiddenLayers = new int[]{45, 20, 13};
 
     //Player control stuff
     boolean playerControl;
@@ -475,7 +475,6 @@ public class Agent implements Serializable {
 
     //Should be called after agent moves
     private void checkContainingSection() {
-        //TODO: there is a possible optimization where the agent stores its xID and yID and checks if they ever change. this is faster than getting an object from an array just to compare it
 //        VisionOptimiser.Section tempSection = optimiser.getSection(x, y);
         sectionX = optimiser.getSectionID(x);
         sectionY = optimiser.getSectionID(y);
@@ -537,7 +536,7 @@ public class Agent implements Serializable {
         brain.setInput(5 * eyes.length + 4, colliding ? 1 : 0);
         brain.setInput(5 * eyes.length + 5, Math.cos(direction));
         brain.setInput(5 * eyes.length + 6, Math.sin(direction));
-        //brain.setInput(5 * eyes.length + 5, Math.random() - 0.5);
+//        brain.setInput(5 * eyes.length + 823, Math.random() - 0.5);
 
         //Update brain
         brain.calculateNet();
@@ -554,10 +553,9 @@ public class Agent implements Serializable {
         rgb[2] = ((brain.getOutput(4)) * 255);
         eat = brain.getOutput(5) > 0.0;
         reproduce = brain.getOutput(6) > 0.0;
-        //TODO: add sexual reproduction
 
         for (int i = MISC_OUTPUT_COUNT; i < MISC_OUTPUT_COUNT + FEEDBACK_NEURONS; i++) {
-            brain.setInput(i - MISC_OUTPUT_COUNT + (5 * eyes.length), brain.getOutput(i));
+            brain.setInput(i - MISC_OUTPUT_COUNT + MISC_INPUT_COUNT + (5 * eyes.length), brain.getOutput(i));
         }
     }
 

@@ -12,9 +12,9 @@ import java.util.Random;
 public class NeuralNetwork implements Serializable {
     final static double INIT_WEIGHT_POW = 1;
     final static double INIT_WEIGHT_SCALE = 0.4f;
-    final static double INIT_WEIGHT_ACTIVITY = 23.0;
+    final static double INIT_WEIGHT_ACTIVITY = 1/4.0; //23
     final static double MUTATION_POW = 1;
-    final static double MUTATION_SCALE = 0.03; //0.013
+    final static double MUTATION_SCALE = 0.015; //0.03
     final static double MUTATION_CHANCE = 1; //0.01
 
     final static double WEIGHT_MUTABILITY_MUTATION_RATE = 0.01; //0.075
@@ -24,7 +24,7 @@ public class NeuralNetwork implements Serializable {
     final static int WIDTH_SPACING = 400;
     final static int HEIGHT_SPACING = 25;
     final static float NEURON_SIZE = 7;
-    final static float LAYER_HEIGHT = 25;
+    final static float LAYER_HEIGHT = 35;
 
     double[] inputs;
     double[] outputs;
@@ -120,8 +120,8 @@ public class NeuralNetwork implements Serializable {
         }
 
         for (int i = 0; i < inputs.length; i++) {
-            graphics.stroke((float) ((1 + inputs[i]) * BRIGHTNESS_MULTIPLIER));
-            graphics.fill((float) ((1 + inputs[i]) * BRIGHTNESS_MULTIPLIER));
+            graphics.stroke((float) ((0.5 + inputs[i]) * BRIGHTNESS_MULTIPLIER));
+            graphics.fill((float) ((0.5 + inputs[i]) * BRIGHTNESS_MULTIPLIER));
 
             graphics.ellipse(x - WIDTH_SPACING, y + i * HEIGHT_SPACING * LAYER_HEIGHT / inputs.length, NEURON_SIZE, NEURON_SIZE);
         }
@@ -155,7 +155,8 @@ public class NeuralNetwork implements Serializable {
 
             for (int i = 0; i < inputs + 1; i++) {      //Randomly set weights
                 for (int j = 0; j < outputs; j++) {
-                    weights[i][j] = GlobalRandom.random.nextGaussian() / Math.pow(((inputs + 1) * outputs) / INIT_WEIGHT_ACTIVITY, .5);
+//                    weights[i][j] = GlobalRandom.random.nextGaussian() / Math.pow(((inputs + 1) * outputs) / INIT_WEIGHT_ACTIVITY, .5);
+                    weights[i][j] = GlobalRandom.random.nextGaussian() * INIT_WEIGHT_ACTIVITY;
                     weightMutability[i][j] = 1; //Default to 1 so all weights are mutable
                 }
             }
@@ -217,7 +218,7 @@ public class NeuralNetwork implements Serializable {
         public void drawLayer(PApplet graphics, float x, float y) {
             for (int i = 0; i < inputs + 1; i++) {
                 for (int j = 0; j < outputs; j++) {
-                    if (Math.abs(weights[i][j]) > 0.0) {
+                    if (Math.abs(weights[i][j]) > 0.75) {
                         graphics.stroke((float) ((weights[i][j]) * BRIGHTNESS_MULTIPLIER), 0, (float) ((-weights[i][j]) * BRIGHTNESS_MULTIPLIER), (float) Math.abs(weights[i][j] * 255.0));
                         graphics.line(x - WIDTH_SPACING, y + (i * HEIGHT_SPACING * LAYER_HEIGHT) / inputs, x, y + j * HEIGHT_SPACING * LAYER_HEIGHT / outputs);
                     }
@@ -225,8 +226,8 @@ public class NeuralNetwork implements Serializable {
             }
 
             for (int j = 0; j < neurons.length; j++) {
-                graphics.fill((float) ((1 + neurons[j].getOutput()) * BRIGHTNESS_MULTIPLIER));
-                graphics.stroke((float) ((1 + neurons[j].getOutput()) * 255));
+                graphics.fill((float) ((0.5 + neurons[j].getOutput()) * BRIGHTNESS_MULTIPLIER));
+                graphics.stroke((float) ((0.5 + neurons[j].getOutput()) * BRIGHTNESS_MULTIPLIER));
                 graphics.ellipse(x, y + j * HEIGHT_SPACING * LAYER_HEIGHT / outputs, NEURON_SIZE, NEURON_SIZE);
             }
         }
@@ -234,12 +235,14 @@ public class NeuralNetwork implements Serializable {
         public void drawWeightMutability(PApplet graphics, float x, float y) {
             for (int i = 0; i < inputs + 1; i++) {
                 for (int j = 0; j < outputs; j++) {
-                    graphics.textSize(14);
-                    graphics.fill((float) ((weightMutability[i][j]/2.0) * BRIGHTNESS_MULTIPLIER));
+                    if (Math.abs(weightMutability[i][j] - 1) > 0.5) {
+                        graphics.textSize(14);
+                        graphics.fill((float) ((weightMutability[i][j]/2.0) * BRIGHTNESS_MULTIPLIER));
 //                    graphics.line(x - WIDTH_SPACING, y + (i * HEIGHT_SPACING * LAYER_HEIGHT) / inputs, x, y + j * HEIGHT_SPACING * LAYER_HEIGHT / outputs);
-                    float textX = ((x - WIDTH_SPACING) + x) / 2.0f;
-                    float textY = ((y + (i * HEIGHT_SPACING * LAYER_HEIGHT) / inputs) + (y + j * HEIGHT_SPACING * LAYER_HEIGHT / outputs)) / 2.0f;
-                    graphics.text(PApplet.nf((float) weightMutability[i][j], 1, 2), textX, textY);
+                        float textX = ((x - WIDTH_SPACING) + x) / 2.0f;
+                        float textY = ((y + (i * HEIGHT_SPACING * LAYER_HEIGHT) / inputs) + (y + j * HEIGHT_SPACING * LAYER_HEIGHT / outputs)) / 2.0f;
+                        graphics.text(PApplet.nf((float) weightMutability[i][j], 1, 2), textX, textY);
+                    }
                 }
             }
         }

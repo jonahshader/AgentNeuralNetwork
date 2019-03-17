@@ -54,7 +54,7 @@ public class GameManager implements Serializable {
 
     public GameManager(AgentEvolution mainClass) {
         playingGame = false;
-        Modes.setScale(5.0f); //0.6
+        Modes.setScale(0.8f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();
@@ -80,7 +80,8 @@ public class GameManager implements Serializable {
         spikesToAdd = new ArrayList<>();
 
         //spawn initial agents
-        while (unusedEnergy >= Modes.getMinimumStartingAgentEnergy() + (Modes.getMinimumAgentCount() * Modes.getMinimumStartingAgentEnergy())) {
+//        while (unusedEnergy >= Modes.getMinimumStartingAgentEnergy() + (Modes.getMinimumAgentCount() * Modes.getMinimumStartingAgentEnergy())) {
+        while(true) {
             if (agents.size() >= Modes.getStartingAgentCount())
                 break;
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
@@ -353,9 +354,11 @@ public class GameManager implements Serializable {
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
 //            System.out.println("Population too low; adding new agent");
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
+//            System.out.println("below threshold. agent added");
         } else if (time % 72000 == 0){ //also spawn one periodically to add genetic variance to the simulation
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
+//            System.out.println("periodic agent added");
         }
 
         //increment epoch
