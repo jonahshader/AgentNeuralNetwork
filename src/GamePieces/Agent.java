@@ -30,11 +30,11 @@ public class Agent implements Serializable {
     final static double IDLE_FOOD_COST = 0.1; // 0.01
     final static double MOVE_FOOD_COST = 0.1f; // 0.03
     final static double ENERGY_DIAMETER_SCALE = 0.01f;
-    final static double ENERGY_CONSUMPTION_SIZE_POW = 1.6f; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
-    final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.0f;
+    final static double ENERGY_CONSUMPTION_SIZE_POW = 2; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
+    final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.3f;
     final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
     final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
-    final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 1.1f;
+    final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 2f;
 
     final static double MUTATION_RATE_MUTATION_RATE = 0.015; // The mutation rate for the mutation rate (multiplier). Applies to entire neural network
 
@@ -42,7 +42,7 @@ public class Agent implements Serializable {
 
     //Sensor constants
     final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 4);
-    final static int EYE_COUNT = 1;  //Must be an odd number for now
+    final static int EYE_COUNT = 3;  //Must be an odd number for now
     final static double EYE_LENGTH_SCALE = 4;
     public final static double EYE_LENGTH = 350;
     final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
@@ -428,9 +428,15 @@ public class Agent implements Serializable {
 
         double moveEnergy = calculateMoveEnergy() * energyConsumptionMultiplier;
         double turnEnergy = calculateTurnEnergy() * energyConsumptionMultiplier;
-        if (print)
-            System.out.println("Agent idle, move, turn energy: " + idleEnergy + " " + moveEnergy + " " + turnEnergy);
-        return idleEnergy + moveEnergy + turnEnergy;
+
+        double nonIdle = Math.pow(moveEnergy + turnEnergy, ENERGY_CONSUMPTION_OVERALL_POW);
+        double totalEnergy = nonIdle + idleEnergy;
+
+        if (print) {
+            System.out.println("Agent idle, move, turn, total energy: " + idleEnergy + " " + moveEnergy + " " + turnEnergy + " " + totalEnergy);
+        }
+
+        return totalEnergy;
     }
 
     public double calculateIdleEnergy() {

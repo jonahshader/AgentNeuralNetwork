@@ -23,9 +23,9 @@ public class Modes {
     //GameManager parameters
     private static int worldWidth = 15000;
     private static int worldHeight = 12500;
-    private static int startingAgentCount = 750;
-    private static int startingPlantCount = 1000;
-    private static int startingSpikeCount = 500;
+    private static int startingAgentCount = 1000;
+    private static int startingPlantCount = 500;
+    private static int startingSpikeCount = 300;
     private static int minimumAgentCount = 250;
     private static double minimumStartingAgentEnergy = 1200f;
     private static double startingEnergyBoostScale = (Agent.MIN_REPRODUCE_ENERGY / minimumStartingAgentEnergy) * 0.5;
