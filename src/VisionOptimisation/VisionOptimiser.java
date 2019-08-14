@@ -7,28 +7,21 @@ import processing.core.PApplet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static processing.core.PConstants.CORNER;
 
 /**
  * Created by Jonah on 3/26/2017.
  */
-//TODO: rewrite entire vision optimiser so that the agents and plants decide what section they are in.
 public class VisionOptimiser implements Serializable {
-    final static int SECTION_SIZE = 350;///256
-    final static int SECTION_VIEW_RANGE = 1; // additional sections in all directions the content can react to. should be at least 1
-    int worldWidth;
-    int worldHeight;
-    int time = 0;
+    private final static int SECTION_SIZE = 350;///256
+    private final static int SECTION_VIEW_RANGE = 1; // additional sections in all directions the content can react to. should be at least 1
 
-    Section[][] sections;
-    int sectionWidthCount;
-    int sectionHeightCount;
+    private Section[][] sections;
+    private int sectionWidthCount;
+    private int sectionHeightCount;
 
     public VisionOptimiser(int worldWidth, int worldHeight) {
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
 
         //TODO: might need to use floor() instead of casting to (int) here
         sectionWidthCount = (int) ((((float) worldWidth) / SECTION_SIZE) + 1);
@@ -50,16 +43,11 @@ public class VisionOptimiser implements Serializable {
             }
         }
 
-//        if (time % 10 == 0) {
-            for (Section[] sectionSlice : sections) {
-                for (Section section : sectionSlice) {
-                    section.removeDeadAgents();
-                }
+        for (Section[] sectionSlice : sections) {
+            for (Section section : sectionSlice) {
+                section.removeDeadAgents();
             }
-//        }
-
-
-        time++;
+        }
     }
 
     public void drawDebug(PApplet graphics) {
@@ -70,16 +58,12 @@ public class VisionOptimiser implements Serializable {
         }
     }
 
-    public Section getSection(int xID, int yID) {
+    private Section getSection(int xID, int yID) {
         //Wrap around
         while (xID < 0) xID += sectionWidthCount;
         while (xID >= sectionWidthCount) xID -= sectionWidthCount;
         while (yID < 0) yID += sectionHeightCount;
         while (yID >= sectionHeightCount) yID -= sectionHeightCount;
-
-//        if (sections[xID][yID] == null) {
-//            System.out.println("WARNING: TRIED USING NULL SECTION");
-//        }
 
         return sections[xID][yID];
     }
@@ -108,7 +92,7 @@ public class VisionOptimiser implements Serializable {
         private boolean visiblePlantsUpdated = false;
         private boolean visibleSpikesUpdated = false;
 
-        public Section(int xID, int yID) {
+        Section(int xID, int yID) {
             this.xID = xID;
             this.yID = yID;
             this.agents = new ArrayList<>();

@@ -1,7 +1,6 @@
 package GamePieces;
 
 import GamePieces.AgentParts.AgentEye;
-import MainParts.AgentEvolution;
 import MainParts.GameManager;
 import MainParts.GlobalRandom;
 import MainParts.Modes;
@@ -24,32 +23,31 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 //genetic mutation can affect the location and count of these feeders
 
 public class Agent implements Serializable {
-    final static double SIZE_SCALE = 1f;
-    final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
-    final static double TURN_FOOD_COST = 0.8; //20
-    final static double IDLE_FOOD_COST = 0.1; // 0.01
-    final static double MOVE_FOOD_COST = 0.1f; // 0.03
-    final static double ENERGY_DIAMETER_SCALE = 0.01f;
-    final static double ENERGY_CONSUMPTION_SIZE_POW = 2; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
-    final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.3f;
-    final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
-    final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
-    final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 2f;
+    private final static double SIZE_SCALE = 1f;
+    private final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
+    private final static double TURN_FOOD_COST = 0.8; //20
+    private final static double IDLE_FOOD_COST = 0.1; // 0.01
+    private final static double MOVE_FOOD_COST = 0.1f; // 0.03
+    private final static double ENERGY_DIAMETER_SCALE = 0.01f;
+    private final static double ENERGY_CONSUMPTION_SIZE_POW = 2; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
+    private final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.3f;
+    private final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
+    private final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
+    private final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 2f;
 
-    final static double MUTATION_RATE_MUTATION_RATE = 0.015; // The mutation rate for the mutation rate (multiplier). Applies to entire neural network
+    private final static double MUTATION_RATE_MUTATION_RATE = 0.015; // The mutation rate for the mutation rate (multiplier). Applies to entire neural network
 
     public final static double MIN_REPRODUCE_ENERGY = 2000;
 
     //Sensor constants
-    final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 4);
-    final static int EYE_COUNT = 3;  //Must be an odd number for now
-    final static double EYE_LENGTH_SCALE = 4;
+    private final static double EYE_ANGLE_WIDTH = Math.PI / 4;
+    private final static int EYE_COUNT = 3;  //Must be an odd number for now
     public final static double EYE_LENGTH = 350;
-    final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
+    private final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
     //health, energy, diameter, x, y, cos, sin
-    final static int MISC_INPUT_COUNT = 7;
+    private final static int MISC_INPUT_COUNT = 7;
     //red, green, blue, speed, direction change, eat, reproduce
-    final static int MISC_OUTPUT_COUNT = 7;
+    private final static int MISC_OUTPUT_COUNT = 7;
     private static int screenWidth;
     private static int screenHeight;
     private static int mouseX;
@@ -59,9 +57,8 @@ public class Agent implements Serializable {
     private int[] hiddenLayers = new int[]{45, 20, 13};
 
     //Player control stuff
-    boolean playerControl;
-    boolean spectating = false;
-    boolean isPlayer = false;
+    private boolean playerControl;
+    private boolean spectating = false;
 
     private ArrayList<Agent> otherAgents;
     private ArrayList<Plant> otherPlants;
@@ -88,7 +85,6 @@ public class Agent implements Serializable {
     private boolean eat;
     private boolean reproduce;
     private int age = 0;
-    private boolean baby = false;
     private boolean dead = false;
     private boolean colliding = false;
     private boolean isAStartingAgent;
@@ -103,7 +99,6 @@ public class Agent implements Serializable {
         this.otherAgents = game.getAgents();
         this.otherPlants = game.getPlants();
         this.otherSpikes = game.getSpikes();
-        this.isPlayer = isPlayer;
         parentAgent = null;
         optimiser = game.optimiser;
         isAStartingAgent = true;
@@ -163,8 +158,7 @@ public class Agent implements Serializable {
         updateSensorLocations();
     }
 
-    public Agent(double energy, Agent parentAgent, boolean mutate, double mutationRate, boolean control, boolean spectate) {
-        baby = true;
+    private Agent(double energy, Agent parentAgent, boolean mutate, double mutationRate, boolean control, boolean spectate) {
         this.mutationRate = mutationRate + GlobalRandom.random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
         this.energy = energy;
         this.parentAgent = parentAgent;
@@ -575,9 +569,7 @@ public class Agent implements Serializable {
 
     private boolean visibleOnScreen(PApplet mainProgram) {
         if (game.worldToScreenX(x + diameter, mainProgram) > 0 && game.worldToScreenX(x - diameter, mainProgram) < mainProgram.width) {
-            if (game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height) {
-                return true;
-            }
+            return game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height;
         }
         return false;
     }

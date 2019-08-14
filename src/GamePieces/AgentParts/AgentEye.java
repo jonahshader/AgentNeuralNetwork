@@ -3,7 +3,6 @@ package GamePieces.AgentParts;
 import GamePieces.Agent;
 import GamePieces.Plant;
 import GamePieces.Spike;
-import MainParts.AgentEvolution;
 import MainParts.Environment;
 import MainParts.GameManager;
 import processing.core.PApplet;
@@ -65,10 +64,6 @@ public class AgentEye implements Serializable {
             if (eyeLine.ptSegDist(plant.getX(), plant.getY()) < plant.getDiameter() / 2) {  //Circle collided, it is visible to this eye
                 float tempDistance = PApplet.dist((float) parentAgent.getX(), (float) parentAgent.getY(), (float) plant.getX(), (float) plant.getY());
 
-//                //EXPERIMENTAL CODE BELOW
-//                tempDistance -= (plant.getDiameter() / 2.0);
-//                if (tempDistance < 0) tempDistance = 0;
-
                 if (tempDistance < shortestDistance) {
                     closestPlant = plant;
                     closestAgent = null;    //Agent is no longer the closest object to the eye, make it null so it can't be used
@@ -81,10 +76,6 @@ public class AgentEye implements Serializable {
             for (Spike spike : visibleSpikes) {
                 if (eyeLine.ptSegDist(spike.getX(), spike.getY()) < spike.getDiameter() / 2) {  //Circle collided, it is visible to this eye
                     float tempDistance = PApplet.dist((float) parentAgent.getX(), (float) parentAgent.getY(), (float) spike.getX(), (float) spike.getY());
-
-//                //EXPERIMENTAL CODE BELOW
-//                tempDistance -= (plant.getDiameter() / 2.0);
-//                if (tempDistance < 0) tempDistance = 0;
 
                     if (tempDistance < shortestDistance) {
                         closestSpike = spike;
@@ -116,14 +107,6 @@ public class AgentEye implements Serializable {
     public void drawEye(PApplet graphics) {
         graphics.stroke((float) itemRgbData[0], (float) itemRgbData[1], (float) itemRgbData[2]);
         graphics.line((float) eyeLine.getX1(), (float) eyeLine.getY1(), (float) eyeLine.getX2(), (float) eyeLine.getY2());
-    }
-
-    public double getRelativeAngle() {
-        return relativeAngle;
-    }
-
-    public Line2D getEyeLine() {
-        return eyeLine;
     }
 
     public double[] getItemRgbData() {

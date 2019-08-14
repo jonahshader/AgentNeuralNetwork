@@ -6,18 +6,18 @@ import java.io.Serializable;
  * Created by Jonah on 4/7/2017.
  */
 public class Environment implements Serializable {
-    public final static boolean DAY_NIGHT_CYCLE_ENABLED = false;
-    public final static float DAY_NIGHT_CYCLE_LENGTH = 10000.0f; //10000
-    public final static float MAX_BRIGHTNESS = 0.1f;
+    private final static boolean DAY_NIGHT_CYCLE_ENABLED = false;
+    private final static float DAY_NIGHT_CYCLE_LENGTH = 10000.0f; //10000
+    private final static float MAX_BRIGHTNESS = 0.1f;
 
-    float brightness;
+    private float brightness;
 
-    public Environment() {
+    Environment() {
         calculateEnvironment(0);
     }
 
     //may contain other enviornmental things in the future
-    public void calculateEnvironment(long rawFrameCount) {
+    void calculateEnvironment(long rawFrameCount) {
         calculateDayTime(rawFrameCount);
     }
 
@@ -37,6 +37,5 @@ public class Environment implements Serializable {
         } else {
             brightness = MAX_BRIGHTNESS;
         }
-
     }
 }

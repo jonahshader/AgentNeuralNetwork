@@ -6,7 +6,7 @@ import processing.event.MouseEvent;
 /**
  * Created by loshaderj16 on 3/13/2017.
  */
-public class AgentEvolution extends PApplet{
+public class AgentEvolution extends PApplet {
 
     private GameManager mainGame;
 

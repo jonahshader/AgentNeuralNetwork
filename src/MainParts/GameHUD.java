@@ -8,16 +8,16 @@ import java.io.Serializable;
 /**
  * Created by Jonah on 3/27/2017.
  */
-public class GameHUD implements Serializable {
-    final static float Y_OFFSET = 32;
-    GameManager game;
-    Agent spectatingAgent;
+class GameHUD implements Serializable {
+    private final static float Y_OFFSET = 32;
+    private GameManager game;
+    private Agent spectatingAgent;
 
-    public GameHUD(GameManager game) {
+    GameHUD(GameManager game) {
         this.game = game;
     }
 
-    public void drawHUD(PApplet graphics) {
+    void drawHUD(PApplet graphics) {
         graphics.textSize(24);
 
         graphics.fill(0);
@@ -43,7 +43,7 @@ public class GameHUD implements Serializable {
         }
     }
 
-    public void setSpectatingAgent(Agent spectatingAgent) {
+    void setSpectatingAgent(Agent spectatingAgent) {
         this.spectatingAgent = spectatingAgent;
     }
 
@@ -58,7 +58,7 @@ public class GameHUD implements Serializable {
         graphics.endShape(PApplet.CLOSE);
     }
 
-    public void mousePressed() {
+    void mousePressed() {
 
     }
 }

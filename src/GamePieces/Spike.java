@@ -1,15 +1,12 @@
 package GamePieces;
 
-import MainParts.AgentEvolution;
 import MainParts.GameManager;
-import MainParts.GlobalRandom;
 import MainParts.Modes;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Random;
 
 import static NeuralNetStuff.NeuralNetwork.ranRange;
 
@@ -29,16 +26,12 @@ public class Spike implements Serializable {
     private double[] rgb;
     private boolean dead;
 
-    private VisionOptimiser optimiser;
-    private VisionOptimiser.Section containingSection;
     private GameManager game;
-    private ArrayList<Spike> otherSpikes;
 
     public Spike(ArrayList<Spike> otherSpikes, GameManager game) {
         this.game = game;
-        this.otherSpikes = otherSpikes;
         dead = false;
-        optimiser = game.optimiser;
+        VisionOptimiser optimiser = game.optimiser;
 
         if (Math.random() > 0.4 && otherSpikes.size() >= 2) {
             //Spawn near last spike
@@ -64,8 +57,7 @@ public class Spike implements Serializable {
         rgb[2] = (((Math.random() * BASE_COLOR_VARIANCE * 2.0) + (1 - BASE_COLOR_VARIANCE)) * BASE_COLOR_BLUE);
 
         //Find containing section
-        containingSection = optimiser.getSection(x, y);
-        containingSection.getSpikes().add(this);
+        optimiser.getSection(x, y).getSpikes().add(this);
     }
 
     public void drawSpike(PApplet mainProgram) {
@@ -78,7 +70,7 @@ public class Spike implements Serializable {
     }
 
     public void run() {
-        if (!dead) {
+//        if (!dead) {
 //            //Move around randomly
 //            if (Math.random() > 0.95) {
 //                x += GlobalRandom.random.nextGaussian();
@@ -94,7 +86,7 @@ public class Spike implements Serializable {
 //            } else if (y < 0) {
 //                y += Modes.getWorldHeight();
 //            }
-        }
+//        }
     }
 
     public boolean isDead() {
@@ -103,9 +95,7 @@ public class Spike implements Serializable {
 
     private boolean visibleOnScreen(PApplet mainProgram) {
         if (game.worldToScreenX(x + diameter, mainProgram) > 0 && game.worldToScreenX(x - diameter, mainProgram) < mainProgram.width) {
-            if (game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height) {
-                return true;
-            }
+            return game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height;
         }
         return false;
     }

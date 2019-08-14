@@ -44,15 +44,13 @@ public class GameManager implements Serializable {
     private double viewportX = 0;
     private double viewportY = 0;
     private double viewportZoom = 1;
-    private boolean playingGame;
 
     //System wide energy
     private double unusedEnergy;
 
     private NumberFormat formatter;
 
-    public GameManager(PApplet mainClass) {
-        playingGame = false;
+    GameManager(PApplet mainClass) {
         Modes.setScale(1.5f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
@@ -78,10 +76,7 @@ public class GameManager implements Serializable {
         spikesToAdd = new ArrayList<>();
 
         //spawn initial agents
-//        while (unusedEnergy >= Modes.getMinimumStartingAgentEnergy() + (Modes.getMinimumAgentCount() * Modes.getMinimumStartingAgentEnergy())) {
-        while(true) {
-            if (agents.size() >= Modes.getStartingAgentCount())
-                break;
+        while (agents.size() < Modes.getStartingAgentCount()) {
             agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, false));
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
         }
@@ -99,7 +94,7 @@ public class GameManager implements Serializable {
         mainClass.frameRate((float) targetFps);
     }
 
-    public void draw(PApplet mainClass) {
+    void draw(PApplet mainClass) {
         //When drawingEnabled is enabled, render and run the simulation
         if(drawingEnabled) {
             run(mainClass);
@@ -152,26 +147,19 @@ public class GameManager implements Serializable {
         hud.drawHUD(mainClass);
     }
 
-    public boolean isPlayingGame() {
-        return playingGame;
-    }
-
-    public void mousePressed(PApplet mainClass) {
+    void mousePressed(PApplet mainClass) {
         if (drawingEnabled) {                             //Only handle these mouse presses when you can see what you are clicking!
             hud.mousePressed();
             if (mainClass.mouseButton == PConstants.LEFT) {
                 for (Agent agent : agents) {
                     if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(mainClass), (float) screenToWorldY(mainClass)) < agent.getDiameter() / 2.0) {
-                        Agent controlledAgent = agent;
-                        controlledAgent.enablePlayerControl();
+                        agent.enablePlayerControl();
                     } else {
                         agent.disablePlayerControl();
                     }
                 }
             } else if (mainClass.mouseButton == PConstants.RIGHT) {
-                for (int i = 0; i < agents.size(); i++) {
-                    Agent agent = agents.get(i);
-
+                for (Agent agent : agents) {
                     if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(mainClass), (float) screenToWorldY(mainClass)) < agent.getDiameter() / 2.0) {
                         agent.killAgent();
                     } else {
@@ -192,7 +180,7 @@ public class GameManager implements Serializable {
         }
     }
 
-    public void keyPressed(PApplet mainClass) {
+    void keyPressed(PApplet mainClass) {
         if (mainClass.key == 'o' || mainClass.key == 'O') drawingEnabled = !drawingEnabled;
         if (drawingEnabled) {
             mainClass.frameRate((float) targetFps);
@@ -293,7 +281,7 @@ public class GameManager implements Serializable {
         this.viewportZoom = viewportZoom;
     }
 
-    public void mouseWheel(MouseEvent event) {
+    void mouseWheel(MouseEvent event) {
         double e = event.getCount();
         viewportZoom *= Math.pow(0.8, e);
     }
@@ -302,11 +290,11 @@ public class GameManager implements Serializable {
         return drawingDebugGraphics;
     }
 
-    public double getUnusedEnergy() {
+    double getUnusedEnergy() {
         return unusedEnergy;
     }
 
-    public boolean isDrawingBrain() {
+    boolean isDrawingBrain() {
         return drawingBrain;
     }
 
@@ -326,9 +314,6 @@ public class GameManager implements Serializable {
         this.enableSpikes = enableSpikes;
     }
 
-    public void startGame() {
-    }
-
     //Main computation
     private void run(PApplet mainClass) {
         if (drawingEnabled) {
@@ -336,9 +321,7 @@ public class GameManager implements Serializable {
                 mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
             }
         } else {
-//            if (mainClass.frameCount % 200 == 0) {
-                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
-//            }
+            mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
         }
 
         //Keyboard viewport control
@@ -446,7 +429,7 @@ public class GameManager implements Serializable {
     }
 
     // returns total energy in the system
-    public double calculateTotalEnergy() {
+    double calculateTotalEnergy() {
         double totalEnergy = unusedEnergy;
         for (Agent agent : agents) {
             totalEnergy += agent.getEnergy();
