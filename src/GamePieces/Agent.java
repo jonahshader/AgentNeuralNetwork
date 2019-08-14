@@ -50,6 +50,11 @@ public class Agent implements Serializable {
     final static int MISC_INPUT_COUNT = 7;
     //red, green, blue, speed, direction change, eat, reproduce
     final static int MISC_OUTPUT_COUNT = 7;
+    private static int screenWidth;
+    private static int screenHeight;
+    private static int mouseX;
+    private static int mouseY;
+    private static float frameRate;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
     private int[] hiddenLayers = new int[]{45, 20, 13};
 
@@ -61,7 +66,6 @@ public class Agent implements Serializable {
     private ArrayList<Agent> otherAgents;
     private ArrayList<Plant> otherPlants;
     private ArrayList<Spike> otherSpikes;
-    private AgentEvolution mainProgram;
     private Agent parentAgent;
     private GameManager game;
     //Collision detection/vision stuff
@@ -93,9 +97,8 @@ public class Agent implements Serializable {
     private NeuralNetwork brain;
     private AgentEye[] eyes;
 
-    public Agent(double energy, GameManager game, AgentEvolution mainProgram, boolean isPlayer) {
+    public Agent(double energy, GameManager game, boolean isPlayer) {
         this.energy = energy;
-        this.mainProgram = mainProgram;
         this.game = game;
         this.otherAgents = game.getAgents();
         this.otherPlants = game.getPlants();
@@ -164,7 +167,6 @@ public class Agent implements Serializable {
         baby = true;
         this.mutationRate = mutationRate + GlobalRandom.random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
         this.energy = energy;
-        this.mainProgram = parentAgent.mainProgram;
         this.parentAgent = parentAgent;
         this.game = parentAgent.game;
         optimiser = game.optimiser;
@@ -206,25 +208,33 @@ public class Agent implements Serializable {
         updateSensorLocations();
     }
 
-    public void drawAgent() {
-        if (visibleOnScreen() && !dead) {   //Only draw if its alive and on the screen
+    public void drawAgent(PApplet graphics) {
+        if (visibleOnScreen(graphics) && !dead) {   //Only draw if its alive and on the screen
             if (game.isDrawingEyes())
                 for (AgentEye tempEye : eyes) {
-                    tempEye.drawEye(mainProgram);
+                    tempEye.drawEye(graphics);
                 }
 
-            mainProgram.fill((float) rgb[0], (float) rgb[1], (float) rgb[2]);
+            graphics.fill((float) rgb[0], (float) rgb[1], (float) rgb[2]);
             double averageColor = (rgb[0] + rgb[1] + rgb[2]) / 3;
             averageColor = (averageColor + 255) / 2.0f;
-            mainProgram.stroke((float) averageColor);
-            mainProgram.ellipse((float) x, (float) y, (float) diameter, (float) diameter);
-            mainProgram.stroke(255);
-            mainProgram.line((float) x, (float) y, (float) (x + (Math.cos(direction) * diameter)), (float) (y + (Math.sin(direction) * diameter)));
-            mainProgram.noStroke();
+            graphics.stroke((float) averageColor);
+            graphics.ellipse((float) x, (float) y, (float) diameter, (float) diameter);
+            graphics.stroke(255);
+            graphics.line((float) x, (float) y, (float) (x + (Math.cos(direction) * diameter)), (float) (y + (Math.sin(direction) * diameter)));
+            graphics.noStroke();
             double healthScaled = health / 100.0;
-            mainProgram.fill((float) (255 - (healthScaled * 255)), (float) (255 * healthScaled), 0);
-            mainProgram.ellipse((float) x, (float) y, (float) diameter / 3, (float) diameter / 3);
+            graphics.fill((float) (255 - (healthScaled * 255)), (float) (255 * healthScaled), 0);
+            graphics.ellipse((float) x, (float) y, (float) diameter / 3, (float) diameter / 3);
         }
+    }
+
+    public static void updateDisplayParameters(PApplet graphics) {
+        screenWidth = graphics.width;
+        screenHeight = graphics.height;
+        mouseX = graphics.mouseX;
+        mouseY = graphics.mouseY;
+        frameRate = graphics.frameRate;
     }
 
     public void moveAgent() {
@@ -245,8 +255,8 @@ public class Agent implements Serializable {
             checkDead();
 
             if (playerControl || spectating) {
-                game.setViewportX(x - (mainProgram.width / 2));
-                game.setViewportY(y - (mainProgram.height / 2));
+                game.setViewportX(x - (screenWidth / 2));
+                game.setViewportY(y - (screenHeight / 2));
             }
 
             updateSensorLocations();
@@ -268,8 +278,8 @@ public class Agent implements Serializable {
             if (playerControl) {
                 reproduce = false;
                 eat = true;
-                direction = Math.atan2(game.screenToWorldY() - y, game.screenToWorldX() - x);
-                speed = PApplet.dist((float) x, (float) y, (float) game.screenToWorldX(), (float) game.screenToWorldY()) / (mainProgram.frameRate * 0.1);
+                direction = Math.atan2(game.screenToWorldY(mouseY, screenHeight) - y, game.screenToWorldX(mouseX, screenWidth) - x);
+                speed = PApplet.dist((float) x, (float) y, (float) game.screenToWorldX(mouseX, screenWidth), (float) game.screenToWorldY(mouseY, screenHeight)) / (frameRate * 0.1);
             } else {
                 controlOutputsWithBrain();
             }
@@ -310,19 +320,17 @@ public class Agent implements Serializable {
                 }
 //            } else {    //If the agent isn't trying to eat, just calculate collision detection
             }
-            if (true) {
-                for (Plant plant : otherPlants) {
-                    if (PApplet.dist((float) x, (float) y, (float) plant.getX(), (float) plant.getY()) < (plant.getDiameter() / 2.0) + (diameter / 2.0)) {
+            for (Plant plant : otherPlants) {
+                if (PApplet.dist((float) x, (float) y, (float) plant.getX(), (float) plant.getY()) < (plant.getDiameter() / 2.0) + (diameter / 2.0)) {
+                    colliding = true;
+                    break;
+                }
+            }
+            for (Agent tempAgent : otherAgents) {
+                if (tempAgent != this && !tempAgent.isDead()) {
+                    if (PApplet.dist((float) x, (float) y, (float) tempAgent.getX(), (float) tempAgent.getY()) < (tempAgent.getDiameter() / 2.0) + (diameter / 2.0)) {
                         colliding = true;
                         break;
-                    }
-                }
-                for (Agent tempAgent : otherAgents) {
-                    if (tempAgent != this && !tempAgent.isDead()) {
-                        if (PApplet.dist((float) x, (float) y, (float) tempAgent.getX(), (float) tempAgent.getY()) < (tempAgent.getDiameter() / 2.0) + (diameter / 2.0)) {
-                            colliding = true;
-                            break;
-                        }
                     }
                 }
             }
@@ -565,9 +573,9 @@ public class Agent implements Serializable {
         }
     }
 
-    private boolean visibleOnScreen() {
-        if (game.worldToScreenX(x + diameter) > 0 && game.worldToScreenX(x - diameter) < mainProgram.width) {
-            if (game.worldToScreenY(y + diameter) > 0 && game.worldToScreenY(y - diameter) < mainProgram.height) {
+    private boolean visibleOnScreen(PApplet mainProgram) {
+        if (game.worldToScreenX(x + diameter, mainProgram) > 0 && game.worldToScreenX(x - diameter, mainProgram) < mainProgram.width) {
+            if (game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height) {
                 return true;
             }
         }

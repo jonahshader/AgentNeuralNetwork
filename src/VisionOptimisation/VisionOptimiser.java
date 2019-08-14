@@ -20,18 +20,15 @@ public class VisionOptimiser implements Serializable {
     final static int SECTION_VIEW_RANGE = 1; // additional sections in all directions the content can react to. should be at least 1
     int worldWidth;
     int worldHeight;
-
-    PApplet graphics;   //For drawing debug lines
     int time = 0;
 
     Section[][] sections;
     int sectionWidthCount;
     int sectionHeightCount;
 
-    public VisionOptimiser(int worldWidth, int worldHeight, PApplet graphics) {
+    public VisionOptimiser(int worldWidth, int worldHeight) {
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
-        this.graphics = graphics;
 
         //TODO: might need to use floor() instead of casting to (int) here
         sectionWidthCount = (int) ((((float) worldWidth) / SECTION_SIZE) + 1);
@@ -65,10 +62,10 @@ public class VisionOptimiser implements Serializable {
         time++;
     }
 
-    public void drawDebug() {
+    public void drawDebug(PApplet graphics) {
         for (Section[] sectionSlice : sections) {
             for (Section section : sectionSlice) {
-                section.drawSectionDebug();
+                section.drawSectionDebug(graphics);
             }
         }
     }
@@ -122,7 +119,7 @@ public class VisionOptimiser implements Serializable {
             visibleSpikes = new ArrayList<>();
         }
 
-        void drawSectionDebug() {
+        void drawSectionDebug(PApplet graphics) {
             graphics.rectMode(CORNER);
             graphics.stroke(0, 255, 255);
             graphics.fill(0, 0, 30);
@@ -201,8 +198,5 @@ public class VisionOptimiser implements Serializable {
             }
             return visibleSpikes;
         }
-
-
-
     }
 }

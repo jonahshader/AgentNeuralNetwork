@@ -12,8 +12,8 @@ public class Environment implements Serializable {
 
     float brightness;
 
-    public Environment(long currentFrame) {
-        calculateEnvironment(currentFrame);
+    public Environment() {
+        calculateEnvironment(0);
     }
 
     //may contain other enviornmental things in the future

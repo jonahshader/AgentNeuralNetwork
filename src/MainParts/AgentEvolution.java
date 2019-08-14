@@ -23,15 +23,15 @@ public class AgentEvolution extends PApplet{
     }
 
     public void draw() {
-        mainGame.draw();
+        mainGame.draw(this);
     }
 
     public void mousePressed() {
-        mainGame.mousePressed();
+        mainGame.mousePressed(this);
     }
 
     public void keyPressed() {
-        mainGame.keyPressed();
+        mainGame.keyPressed(this);
     }
 
     public void mouseWheel(MouseEvent event) {

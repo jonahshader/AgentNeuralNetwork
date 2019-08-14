@@ -5,6 +5,7 @@ import MainParts.GameManager;
 import MainParts.GlobalRandom;
 import MainParts.Modes;
 import VisionOptimisation.VisionOptimiser;
+import processing.core.PApplet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,14 +29,12 @@ public class Spike implements Serializable {
     private double[] rgb;
     private boolean dead;
 
-    private AgentEvolution mainProgram;
     private VisionOptimiser optimiser;
     private VisionOptimiser.Section containingSection;
     private GameManager game;
     private ArrayList<Spike> otherSpikes;
 
-    public Spike(ArrayList<Spike> otherSpikes, GameManager game, AgentEvolution mainProgram) {
-        this.mainProgram = mainProgram;
+    public Spike(ArrayList<Spike> otherSpikes, GameManager game) {
         this.game = game;
         this.otherSpikes = otherSpikes;
         dead = false;
@@ -69,8 +68,8 @@ public class Spike implements Serializable {
         containingSection.getSpikes().add(this);
     }
 
-    public void drawSpike() {
-        if (!dead && visibleOnScreen() && game.isEnableSpikes()) {
+    public void drawSpike(PApplet mainProgram) {
+        if (!dead && visibleOnScreen(mainProgram) && game.isEnableSpikes()) {
             mainProgram.fill((float) rgb[0], (float) rgb[1], (float) rgb[2]);
             mainProgram.stroke(255, 0, 0);
             mainProgram.strokeWeight(1);
@@ -102,9 +101,9 @@ public class Spike implements Serializable {
         return dead;
     }
 
-    private boolean visibleOnScreen() {
-        if (game.worldToScreenX(x + diameter) > 0 && game.worldToScreenX(x - diameter) < mainProgram.width) {
-            if (game.worldToScreenY(y + diameter) > 0 && game.worldToScreenY(y - diameter) < mainProgram.height) {
+    private boolean visibleOnScreen(PApplet mainProgram) {
+        if (game.worldToScreenX(x + diameter, mainProgram) > 0 && game.worldToScreenX(x - diameter, mainProgram) < mainProgram.width) {
+            if (game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height) {
                 return true;
             }
         }

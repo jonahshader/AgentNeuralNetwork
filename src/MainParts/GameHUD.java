@@ -10,16 +10,14 @@ import java.io.Serializable;
  */
 public class GameHUD implements Serializable {
     final static float Y_OFFSET = 32;
-    AgentEvolution graphics;
     GameManager game;
     Agent spectatingAgent;
 
-    public GameHUD(AgentEvolution graphics, GameManager game) {
-        this.graphics = graphics;
+    public GameHUD(GameManager game) {
         this.game = game;
     }
 
-    public void drawHUD() {
+    public void drawHUD(PApplet graphics) {
         graphics.textSize(24);
 
         graphics.fill(0);
@@ -49,7 +47,7 @@ public class GameHUD implements Serializable {
         this.spectatingAgent = spectatingAgent;
     }
 
-    private void polygon(float x, float y, float radius, int npoints) {
+    private void polygon(float x, float y, float radius, int npoints, PApplet graphics) {
         float angle = PApplet.TWO_PI / npoints;
         graphics.beginShape();
         for (float a = 0; a < PApplet.TWO_PI; a += angle) {

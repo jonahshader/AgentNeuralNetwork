@@ -113,7 +113,7 @@ public class AgentEye implements Serializable {
         }
     }
 
-    public void drawEye(AgentEvolution graphics) {
+    public void drawEye(PApplet graphics) {
         graphics.stroke((float) itemRgbData[0], (float) itemRgbData[1], (float) itemRgbData[2]);
         graphics.line((float) eyeLine.getX1(), (float) eyeLine.getY1(), (float) eyeLine.getX2(), (float) eyeLine.getY2());
     }
