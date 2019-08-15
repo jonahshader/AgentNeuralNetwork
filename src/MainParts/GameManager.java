@@ -51,7 +51,7 @@ public class GameManager implements Serializable {
     private NumberFormat formatter;
 
     GameManager(PApplet mainClass) {
-        Modes.setScale(1.5f); //0.6
+        Modes.setScale(0.0001f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();

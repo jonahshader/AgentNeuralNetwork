@@ -5,6 +5,7 @@ import MainParts.GameManager;
 import MainParts.GlobalRandom;
 import MainParts.Modes;
 import NeuralNetStuff.NeuralNetwork;
+import VisionOptimisation.Section;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
@@ -67,7 +68,7 @@ public class Agent implements Serializable {
     private GameManager game;
     //Collision detection/vision stuff
     private VisionOptimiser optimiser;
-    private VisionOptimiser.Section containingSection;
+    private Section containingSection;
     private int sectionX, sectionY;
     private double x;
     private double y;
@@ -487,12 +488,12 @@ public class Agent implements Serializable {
         sectionX = optimiser.getSectionID(x);
         sectionY = optimiser.getSectionID(y);
         if (sectionX != containingSection.getxID() || sectionY != containingSection.getyID()) {
-            VisionOptimiser.Section tempSection = optimiser.getSection(x, y);
+            Section tempSection = optimiser.getSection(x, y);
 
             //Move this element to a different array in a different section
             tempSection.getAgents().add(this);
             containingSection.getAgents().remove(this);
-            containingSection.getVisibleAgents().remove(this);
+            containingSection.getVisibleAgents(optimiser).remove(this);
             containingSection = tempSection;
         }
 //        if (optimiser.getSection(x, y) != containingSection) {
@@ -505,9 +506,9 @@ public class Agent implements Serializable {
     }
 
     private void updateVisibleItems() {
-        otherAgents = containingSection.getVisibleAgents();
-        otherPlants = containingSection.getVisiblePlants();
-        otherSpikes = containingSection.getVisibleSpikes();
+        otherAgents = containingSection.getVisibleAgents(optimiser);
+        otherPlants = containingSection.getVisiblePlants(optimiser);
+        otherSpikes = containingSection.getVisibleSpikes(optimiser);
     }
 
     private void updateSensorLocations() {

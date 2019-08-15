@@ -3,6 +3,7 @@ package GamePieces;
 import MainParts.AgentEvolution;
 import MainParts.GameManager;
 import MainParts.Modes;
+import VisionOptimisation.Section;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
@@ -23,7 +24,7 @@ public class Plant implements Serializable {
     final static double MAX_GROW_RATE = 1.1;
     final static double SIZE_SCALE = 3;
     VisionOptimiser optimiser;
-    VisionOptimiser.Section containingSection;
+    Section containingSection;
     GameManager game;
     ArrayList<Plant> otherPlants;
     boolean dead = false;       //If dead, this was already killed and the energy was managed, it is safe to remove this from any and all arraylists

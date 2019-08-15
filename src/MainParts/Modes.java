@@ -2,13 +2,15 @@ package MainParts;
 
 import GamePieces.Agent;
 
+import java.io.Serializable;
+
 /**
  * Created by Jonah on 4/9/2017.
  */
 
 //TODO: finish this
 //TODO: this was a bad idea. butcher almost everything in here
-public class Modes {
+public class Modes implements Serializable {
     //How difficult the
     public enum Mode {
         PLANTS, NO_PLANTS

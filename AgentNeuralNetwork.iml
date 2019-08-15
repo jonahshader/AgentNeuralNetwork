@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="core" level="project" />
+    <orderEntry type="library" name="com.esotericsoftware:kryo:5.0.0-RC4" level="project" />
   </component>
 </module>
