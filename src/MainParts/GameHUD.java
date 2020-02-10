@@ -23,13 +23,13 @@ class GameHUD implements Serializable {
         graphics.fill(0);
         graphics.text("Agents: " + game.getAgents().size(), 9, 33);
         graphics.text("Unused Energy: " + Math.round(game.getUnusedEnergy()), 9, 33 + Y_OFFSET);
-        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 9, 33 + Y_OFFSET * 2);
+//        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 9, 33 + Y_OFFSET * 2);
         graphics.text("Force Reproduce Mode: " + (game.isForceReproduce() ? "ON" : "OFF"), 9, 33 + Y_OFFSET * 3);
 
         graphics.fill(255);
         graphics.text("Agents: " + game.getAgents().size(), 8, 32);
         graphics.text("Unused Energy: " + Math.round(game.getUnusedEnergy()), 8, 32 + Y_OFFSET);
-        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 8, 32 + Y_OFFSET * 2);
+//        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 8, 32 + Y_OFFSET * 2);
         graphics.text("Force Reproduce Mode: " + (game.isForceReproduce() ? "ON" : "OFF"), 8, 32 + Y_OFFSET * 3);
 
         if (spectatingAgent != null) {
@@ -38,7 +38,7 @@ class GameHUD implements Serializable {
             } else {
                 if (game.isDrawingBrain())
                     spectatingAgent.getBrain().drawNetwork(graphics, 400, 60);
-                spectatingAgent.calculateTotalEnergy(true);
+                spectatingAgent.calculateTotalEnergy(false);
             }
         }
     }

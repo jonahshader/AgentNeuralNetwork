@@ -20,6 +20,7 @@ public class AgentEvolution extends PApplet {
         size(720, 480);
 //        smooth(8);
         noSmooth();
+
     }
 
     public void draw() {
@@ -39,6 +40,6 @@ public class AgentEvolution extends PApplet {
     }
 
     public static void main(String[] args) {
-        PApplet.main("MainParts.AgentEvolution");
+        PApplet.main(AgentEvolution.class);
     }
 }
