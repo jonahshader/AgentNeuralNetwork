@@ -1,11 +1,11 @@
 package GamePieces;
 
 import GamePieces.AgentParts.AgentEye;
-import MainParts.AgentEvolution;
 import MainParts.GameManager;
 import MainParts.GlobalRandom;
 import MainParts.Modes;
 import NeuralNetStuff.NeuralNetwork;
+import VisionOptimisation.Section;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
@@ -24,49 +24,51 @@ import static NeuralNetStuff.NeuralNetwork.ranFlip;
 //genetic mutation can affect the location and count of these feeders
 
 public class Agent implements Serializable {
-    final static double SIZE_SCALE = 1f;
-    final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
-    final static double TURN_FOOD_COST = 0.8; //20
-    final static double IDLE_FOOD_COST = 0.1; // 0.01
-    final static double MOVE_FOOD_COST = 0.1f; // 0.03
-    final static double ENERGY_DIAMETER_SCALE = 0.01f;
-    final static double ENERGY_CONSUMPTION_SIZE_POW = 2; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
-    final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.3f;
-    final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
-    final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
-    final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 2f;
+    private final static double SIZE_SCALE = 1f;
+    private final static double CARNIVORE_CONSUME_RATIO = 0.5f; //efficiency, 1 = 100% of energy transferred, the remainder is sent to master energy
+    private final static double TURN_FOOD_COST = 0.8; //20
+    private final static double IDLE_FOOD_COST = 0.1; // 0.01
+    private final static double MOVE_FOOD_COST = 0.1f; // 0.03
+    private final static double ENERGY_DIAMETER_SCALE = 0.01f;
+    private final static double ENERGY_CONSUMPTION_SIZE_POW = 2; //consumptiom *= diameter^ENERGY_CONSUMPTION_SIZE_POW
+    private final static double ENERGY_CONSUMPTION_OVERALL_POW = 1.3f;
+    private final static double EAT_AGENT_ENERGY_SCALE = 1.5f; //affects comsumption speed, not efficiency
+    private final static double EAT_AGENT_EFFECTIVE_SIZE_SCALE = 0.4f; //check the eatMe method to understand what this means. it essentially means that when eating another agent, this agent's size will be size times this variable. it slows down consumption rate
+    private final static double EAT_PLANT_EFFECTIVE_SIZE_SCALE = 2f;
 
-    final static double MUTATION_RATE_MUTATION_RATE = 0.015; // The mutation rate for the mutation rate (multiplier). Applies to entire neural network
+    private final static double MUTATION_RATE_MUTATION_RATE = 0.015; // The mutation rate for the mutation rate (multiplier). Applies to entire neural network
 
     public final static double MIN_REPRODUCE_ENERGY = 2000;
 
     //Sensor constants
-    final static double EYE_ANGLE_WIDTH = (double) (Math.PI / 4);
-    final static int EYE_COUNT = 3;  //Must be an odd number for now
-    final static double EYE_LENGTH_SCALE = 4;
+    private final static double EYE_ANGLE_WIDTH = Math.PI / 4;
+    private final static int EYE_COUNT = 3;  //Must be an odd number for now
     public final static double EYE_LENGTH = 350;
-    final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
+    private final static int FEEDBACK_NEURONS = 2;  //The last inputs and output neurons will be linked together. this is the number of neurons that will do this
     //health, energy, diameter, x, y, cos, sin
-    final static int MISC_INPUT_COUNT = 7;
+    private final static int MISC_INPUT_COUNT = 7;
     //red, green, blue, speed, direction change, eat, reproduce
-    final static int MISC_OUTPUT_COUNT = 7;
+    private final static int MISC_OUTPUT_COUNT = 7;
+    private static int screenWidth;
+    private static int screenHeight;
+    private static int mouseX;
+    private static int mouseY;
+    private static float frameRate;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
     private int[] hiddenLayers = new int[]{45, 20, 13};
 
     //Player control stuff
-    boolean playerControl;
-    boolean spectating = false;
-    boolean isPlayer = false;
+    private boolean playerControl;
+    private boolean spectating = false;
 
     private ArrayList<Agent> otherAgents;
     private ArrayList<Plant> otherPlants;
     private ArrayList<Spike> otherSpikes;
-    private AgentEvolution mainProgram;
     private Agent parentAgent;
     private GameManager game;
     //Collision detection/vision stuff
     private VisionOptimiser optimiser;
-    private VisionOptimiser.Section containingSection;
+    private Section containingSection;
     private int sectionX, sectionY;
     private double x;
     private double y;
@@ -84,7 +86,6 @@ public class Agent implements Serializable {
     private boolean eat;
     private boolean reproduce;
     private int age = 0;
-    private boolean baby = false;
     private boolean dead = false;
     private boolean colliding = false;
     private boolean isAStartingAgent;
@@ -93,14 +94,12 @@ public class Agent implements Serializable {
     private NeuralNetwork brain;
     private AgentEye[] eyes;
 
-    public Agent(double energy, GameManager game, AgentEvolution mainProgram, boolean isPlayer) {
+    public Agent(double energy, GameManager game, boolean isPlayer) {
         this.energy = energy;
-        this.mainProgram = mainProgram;
         this.game = game;
         this.otherAgents = game.getAgents();
         this.otherPlants = game.getPlants();
         this.otherSpikes = game.getSpikes();
-        this.isPlayer = isPlayer;
         parentAgent = null;
         optimiser = game.optimiser;
         isAStartingAgent = true;
@@ -160,11 +159,9 @@ public class Agent implements Serializable {
         updateSensorLocations();
     }
 
-    public Agent(double energy, Agent parentAgent, boolean mutate, double mutationRate, boolean control, boolean spectate) {
-        baby = true;
+    private Agent(double energy, Agent parentAgent, boolean mutate, double mutationRate, boolean control, boolean spectate) {
         this.mutationRate = mutationRate + GlobalRandom.random.nextGaussian() * MUTATION_RATE_MUTATION_RATE;
         this.energy = energy;
-        this.mainProgram = parentAgent.mainProgram;
         this.parentAgent = parentAgent;
         this.game = parentAgent.game;
         optimiser = game.optimiser;
@@ -206,25 +203,33 @@ public class Agent implements Serializable {
         updateSensorLocations();
     }
 
-    public void drawAgent() {
-        if (visibleOnScreen() && !dead) {   //Only draw if its alive and on the screen
+    public void drawAgent(PApplet graphics) {
+        if (visibleOnScreen(graphics) && !dead) {   //Only draw if its alive and on the screen
             if (game.isDrawingEyes())
                 for (AgentEye tempEye : eyes) {
-                    tempEye.drawEye(mainProgram);
+                    tempEye.drawEye(graphics);
                 }
 
-            mainProgram.fill((float) rgb[0], (float) rgb[1], (float) rgb[2]);
+            graphics.fill((float) rgb[0], (float) rgb[1], (float) rgb[2]);
             double averageColor = (rgb[0] + rgb[1] + rgb[2]) / 3;
             averageColor = (averageColor + 255) / 2.0f;
-            mainProgram.stroke((float) averageColor);
-            mainProgram.ellipse((float) x, (float) y, (float) diameter, (float) diameter);
-            mainProgram.stroke(255);
-            mainProgram.line((float) x, (float) y, (float) (x + (Math.cos(direction) * diameter)), (float) (y + (Math.sin(direction) * diameter)));
-            mainProgram.noStroke();
+            graphics.stroke((float) averageColor);
+            graphics.ellipse((float) x, (float) y, (float) diameter, (float) diameter);
+            graphics.stroke(255);
+            graphics.line((float) x, (float) y, (float) (x + (Math.cos(direction) * diameter)), (float) (y + (Math.sin(direction) * diameter)));
+            graphics.noStroke();
             double healthScaled = health / 100.0;
-            mainProgram.fill((float) (255 - (healthScaled * 255)), (float) (255 * healthScaled), 0);
-            mainProgram.ellipse((float) x, (float) y, (float) diameter / 3, (float) diameter / 3);
+            graphics.fill((float) (255 - (healthScaled * 255)), (float) (255 * healthScaled), 0);
+            graphics.ellipse((float) x, (float) y, (float) diameter / 3, (float) diameter / 3);
         }
+    }
+
+    public static void updateDisplayParameters(PApplet graphics) {
+        screenWidth = graphics.width;
+        screenHeight = graphics.height;
+        mouseX = graphics.mouseX;
+        mouseY = graphics.mouseY;
+        frameRate = graphics.frameRate;
     }
 
     public void moveAgent() {
@@ -245,8 +250,8 @@ public class Agent implements Serializable {
             checkDead();
 
             if (playerControl || spectating) {
-                game.setViewportX(x - (mainProgram.width / 2));
-                game.setViewportY(y - (mainProgram.height / 2));
+                game.setViewportX(x - (screenWidth / 2));
+                game.setViewportY(y - (screenHeight / 2));
             }
 
             updateSensorLocations();
@@ -268,8 +273,8 @@ public class Agent implements Serializable {
             if (playerControl) {
                 reproduce = false;
                 eat = true;
-                direction = Math.atan2(game.screenToWorldY() - y, game.screenToWorldX() - x);
-                speed = PApplet.dist((float) x, (float) y, (float) game.screenToWorldX(), (float) game.screenToWorldY()) / (mainProgram.frameRate * 0.1);
+                direction = Math.atan2(game.screenToWorldY(mouseY, screenHeight) - y, game.screenToWorldX(mouseX, screenWidth) - x);
+                speed = PApplet.dist((float) x, (float) y, (float) game.screenToWorldX(mouseX, screenWidth), (float) game.screenToWorldY(mouseY, screenHeight)) / (frameRate * 0.1);
             } else {
                 controlOutputsWithBrain();
             }
@@ -310,19 +315,17 @@ public class Agent implements Serializable {
                 }
 //            } else {    //If the agent isn't trying to eat, just calculate collision detection
             }
-            if (true) {
-                for (Plant plant : otherPlants) {
-                    if (PApplet.dist((float) x, (float) y, (float) plant.getX(), (float) plant.getY()) < (plant.getDiameter() / 2.0) + (diameter / 2.0)) {
+            for (Plant plant : otherPlants) {
+                if (PApplet.dist((float) x, (float) y, (float) plant.getX(), (float) plant.getY()) < (plant.getDiameter() / 2.0) + (diameter / 2.0)) {
+                    colliding = true;
+                    break;
+                }
+            }
+            for (Agent tempAgent : otherAgents) {
+                if (tempAgent != this && !tempAgent.isDead()) {
+                    if (PApplet.dist((float) x, (float) y, (float) tempAgent.getX(), (float) tempAgent.getY()) < (tempAgent.getDiameter() / 2.0) + (diameter / 2.0)) {
                         colliding = true;
                         break;
-                    }
-                }
-                for (Agent tempAgent : otherAgents) {
-                    if (tempAgent != this && !tempAgent.isDead()) {
-                        if (PApplet.dist((float) x, (float) y, (float) tempAgent.getX(), (float) tempAgent.getY()) < (tempAgent.getDiameter() / 2.0) + (diameter / 2.0)) {
-                            colliding = true;
-                            break;
-                        }
                     }
                 }
             }
@@ -485,12 +488,12 @@ public class Agent implements Serializable {
         sectionX = optimiser.getSectionID(x);
         sectionY = optimiser.getSectionID(y);
         if (sectionX != containingSection.getxID() || sectionY != containingSection.getyID()) {
-            VisionOptimiser.Section tempSection = optimiser.getSection(x, y);
+            Section tempSection = optimiser.getSection(x, y);
 
             //Move this element to a different array in a different section
             tempSection.getAgents().add(this);
             containingSection.getAgents().remove(this);
-            containingSection.getVisibleAgents().remove(this);
+            containingSection.getVisibleAgents(optimiser).remove(this);
             containingSection = tempSection;
         }
 //        if (optimiser.getSection(x, y) != containingSection) {
@@ -503,9 +506,9 @@ public class Agent implements Serializable {
     }
 
     private void updateVisibleItems() {
-        otherAgents = containingSection.getVisibleAgents();
-        otherPlants = containingSection.getVisiblePlants();
-        otherSpikes = containingSection.getVisibleSpikes();
+        otherAgents = containingSection.getVisibleAgents(optimiser);
+        otherPlants = containingSection.getVisiblePlants(optimiser);
+        otherSpikes = containingSection.getVisibleSpikes(optimiser);
     }
 
     private void updateSensorLocations() {
@@ -565,11 +568,9 @@ public class Agent implements Serializable {
         }
     }
 
-    private boolean visibleOnScreen() {
-        if (game.worldToScreenX(x + diameter) > 0 && game.worldToScreenX(x - diameter) < mainProgram.width) {
-            if (game.worldToScreenY(y + diameter) > 0 && game.worldToScreenY(y - diameter) < mainProgram.height) {
-                return true;
-            }
+    private boolean visibleOnScreen(PApplet mainProgram) {
+        if (game.worldToScreenX(x + diameter, mainProgram) > 0 && game.worldToScreenX(x - diameter, mainProgram) < mainProgram.width) {
+            return game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height;
         }
         return false;
     }

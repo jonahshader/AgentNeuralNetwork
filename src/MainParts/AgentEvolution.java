@@ -6,7 +6,7 @@ import processing.event.MouseEvent;
 /**
  * Created by loshaderj16 on 3/13/2017.
  */
-public class AgentEvolution extends PApplet{
+public class AgentEvolution extends PApplet {
 
     private GameManager mainGame;
 
@@ -20,18 +20,19 @@ public class AgentEvolution extends PApplet{
         size(720, 480);
 //        smooth(8);
         noSmooth();
+
     }
 
     public void draw() {
-        mainGame.draw();
+        mainGame.draw(this);
     }
 
     public void mousePressed() {
-        mainGame.mousePressed();
+        mainGame.mousePressed(this);
     }
 
     public void keyPressed() {
-        mainGame.keyPressed();
+        mainGame.keyPressed(this);
     }
 
     public void mouseWheel(MouseEvent event) {
@@ -39,6 +40,6 @@ public class AgentEvolution extends PApplet{
     }
 
     public static void main(String[] args) {
-        PApplet.main("MainParts.AgentEvolution");
+        PApplet.main(AgentEvolution.class);
     }
 }

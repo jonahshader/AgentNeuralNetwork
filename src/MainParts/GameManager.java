@@ -31,7 +31,6 @@ public class GameManager implements Serializable {
     public VisionOptimiser optimiser;
     public static Environment environment;
     private GameHUD hud;
-    private AgentEvolution mainClass;
 
     private boolean drawingEnabled = true;
     private boolean drawingPlants = true;
@@ -45,16 +44,14 @@ public class GameManager implements Serializable {
     private double viewportX = 0;
     private double viewportY = 0;
     private double viewportZoom = 1;
-    private boolean playingGame;
 
     //System wide energy
     private double unusedEnergy;
 
     private NumberFormat formatter;
 
-    public GameManager(AgentEvolution mainClass) {
-        playingGame = false;
-        Modes.setScale(1.5f); //0.6
+    GameManager(PApplet mainClass) {
+        Modes.setScale(1.0f); //0.6
         //uncomment for carnivore mode
 //        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();
@@ -65,12 +62,11 @@ public class GameManager implements Serializable {
         //Init formatter (for numerical text formatting).
         formatter = new DecimalFormat("#0.00");
         //Init HUD for displaying some data
-        hud = new GameHUD(mainClass, this);
+        hud = new GameHUD(this);
         //Create the environment (controls day/night cycle)
-        environment = new Environment(mainClass.frameCount);
+        environment = new Environment();
         //Create the optimiser object
-        optimiser = new VisionOptimiser(Modes.getWorldWidth(), Modes.getWorldHeight(), mainClass);
-        this.mainClass = mainClass; //pass mainClass var
+        optimiser = new VisionOptimiser(Modes.getWorldWidth(), Modes.getWorldHeight());
         //init arraylists
         agents = new ArrayList<>();
         agentsToAdd = new ArrayList<>();
@@ -80,43 +76,40 @@ public class GameManager implements Serializable {
         spikesToAdd = new ArrayList<>();
 
         //spawn initial agents
-//        while (unusedEnergy >= Modes.getMinimumStartingAgentEnergy() + (Modes.getMinimumAgentCount() * Modes.getMinimumStartingAgentEnergy())) {
-        while(true) {
-            if (agents.size() >= Modes.getStartingAgentCount())
-                break;
-            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
+        while (agents.size() < Modes.getStartingAgentCount()) {
+            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, false));
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
         }
 
         //spawn initial spikes
         for (int i = 0; i < Modes.getStartingSpikeCount(); i++) {
-            spikes.add(new Spike(spikes, this, mainClass));
+            spikes.add(new Spike(spikes, this));
         }
 
         //spawn initial plants
         for (int i = 0; i < Modes.getStartingPlantCount(); i++) {
-            plants.add(new Plant(plants, this, mainClass));
+            plants.add(new Plant(plants, this));
         }
 
         mainClass.frameRate((float) targetFps);
     }
 
-    public void draw() {
+    void draw(PApplet mainClass) {
         //When drawingEnabled is enabled, render and run the simulation
         if(drawingEnabled) {
-            run();
-            render();
+            run(mainClass);
+            render(mainClass);
         } else {
             //If we are not drawing to the screen, run the simulation multiple times per frame
             //I do this because rendering a blank frame still takes resources, so now I am only
             //rendering a blank frame every 100th tick of the simulation, saving resources
             for (int i = 0; i < 100; i++) {
-                run();
+                run(mainClass);
             }
         }
     }
 
-    private void render() {
+    private void render(PApplet mainClass) {
         if (mainClass.mouseButton == PConstants.CENTER && mainClass.mousePressed) {
             viewportX += (mainClass.pmouseX - mainClass.mouseX) / viewportZoom;
             viewportY += (mainClass.pmouseY - mainClass.mouseY) / viewportZoom;
@@ -130,46 +123,44 @@ public class GameManager implements Serializable {
         mainClass.translate((float) -viewportX, (float) -viewportY);
         mainClass.background(environment.getBrightness());
         if (drawingDebugGraphics)
-            optimiser.drawDebug();
+            optimiser.drawDebug(mainClass);
 
         if (drawingPlants) {
-            plants.forEach(Plant::drawPlant);
+            for (Plant plant : plants)
+                plant.drawPlant(mainClass);
         }
 
-        spikes.forEach(Spike::drawSpike);
+        for (Spike spike : spikes)
+            spike.drawSpike(mainClass);
 
         if (drawingInitialAgents) {
-            agents.forEach(Agent::drawAgent);
+            for (Agent agent : agents)
+                agent.drawAgent(mainClass);
         } else {
-            agents.stream().filter(agent -> !agent.isAStartingAgent()).forEach(Agent::drawAgent);
+            for (Agent agent : agents)
+                if (!agent.isAStartingAgent())
+                    agent.drawAgent(mainClass);
         }
 
         mainClass.popMatrix();
 
-        hud.drawHUD();
+        hud.drawHUD(mainClass);
     }
 
-    public boolean isPlayingGame() {
-        return playingGame;
-    }
-
-    public void mousePressed() {
+    void mousePressed(PApplet mainClass) {
         if (drawingEnabled) {                             //Only handle these mouse presses when you can see what you are clicking!
             hud.mousePressed();
             if (mainClass.mouseButton == PConstants.LEFT) {
                 for (Agent agent : agents) {
-                    if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(), (float) screenToWorldY()) < agent.getDiameter() / 2.0) {
-                        Agent controlledAgent = agent;
-                        controlledAgent.enablePlayerControl();
+                    if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(mainClass), (float) screenToWorldY(mainClass)) < agent.getDiameter() / 2.0) {
+                        agent.enablePlayerControl();
                     } else {
                         agent.disablePlayerControl();
                     }
                 }
             } else if (mainClass.mouseButton == PConstants.RIGHT) {
-                for (int i = 0; i < agents.size(); i++) {
-                    Agent agent = agents.get(i);
-
-                    if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(), (float) screenToWorldY()) < agent.getDiameter() / 2.0) {
+                for (Agent agent : agents) {
+                    if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(mainClass), (float) screenToWorldY(mainClass)) < agent.getDiameter() / 2.0) {
                         agent.killAgent();
                     } else {
                         agent.disablePlayerControl();
@@ -178,7 +169,7 @@ public class GameManager implements Serializable {
             } else {
                 hud.setSpectatingAgent(null);
                 for (Agent agent : agents) {
-                    if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(), (float) screenToWorldY()) < agent.getDiameter() / 2.0) {
+                    if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(mainClass), (float) screenToWorldY(mainClass)) < agent.getDiameter() / 2.0) {
                         agent.enableSpectating();
                         hud.setSpectatingAgent(agent);
                     } else {
@@ -189,7 +180,7 @@ public class GameManager implements Serializable {
         }
     }
 
-    public void keyPressed() {
+    void keyPressed(PApplet mainClass) {
         if (mainClass.key == 'o' || mainClass.key == 'O') drawingEnabled = !drawingEnabled;
         if (drawingEnabled) {
             mainClass.frameRate((float) targetFps);
@@ -212,7 +203,7 @@ public class GameManager implements Serializable {
         if (mainClass.key == ' ') {
             hud.setSpectatingAgent(null);
             for (Agent agent : agents) {
-                if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(), (float) screenToWorldY()) < agent.getDiameter() / 2.0) {
+                if (PApplet.dist((float) agent.getX(), (float) agent.getY(), (float) screenToWorldX(mainClass), (float) screenToWorldY(mainClass)) < agent.getDiameter() / 2.0) {
                     agent.enableSpectating();
                     hud.setSpectatingAgent(agent);
                 } else {
@@ -254,19 +245,27 @@ public class GameManager implements Serializable {
         return plants;
     }
 
-    public double screenToWorldX() {
+    public double screenToWorldX(PApplet mainClass) {
         return ((((mainClass.mouseX + (-mainClass.width / 2.0)) / viewportZoom) + (mainClass.width / 2.0)) + viewportX);
     }
 
-    public double screenToWorldY() {
+    public double screenToWorldX(int mouseX, int width) {
+        return ((((mouseX + (-width / 2.0)) / viewportZoom) + (width / 2.0)) + viewportX);
+    }
+
+    public double screenToWorldY(PApplet mainClass) {
         return ((((mainClass.mouseY + (-mainClass.height / 2.0)) / viewportZoom) + (mainClass.height / 2.0)) + viewportY);
     }
 
-    public double worldToScreenX(double xIn) {
+    public double screenToWorldY(int mouseY, int height) {
+        return ((((mouseY + (-height / 2.0)) / viewportZoom) + (height / 2.0)) + viewportY);
+    }
+
+    public double worldToScreenX(double xIn, PApplet mainClass) {
         return ((((xIn - viewportX) - (mainClass.width / 2.0)) * viewportZoom) + (mainClass.width / 2.0));
     }
 
-    public double worldToScreenY(double yIn) {
+    public double worldToScreenY(double yIn, PApplet mainClass) {
         return (((yIn - viewportY - (mainClass.height / 2.0)) * viewportZoom) + (mainClass.height / 2.0));
     }
 
@@ -282,7 +281,7 @@ public class GameManager implements Serializable {
         this.viewportZoom = viewportZoom;
     }
 
-    public void mouseWheel(MouseEvent event) {
+    void mouseWheel(MouseEvent event) {
         double e = event.getCount();
         viewportZoom *= Math.pow(0.8, e);
     }
@@ -291,11 +290,11 @@ public class GameManager implements Serializable {
         return drawingDebugGraphics;
     }
 
-    public double getUnusedEnergy() {
+    double getUnusedEnergy() {
         return unusedEnergy;
     }
 
-    public boolean isDrawingBrain() {
+    boolean isDrawingBrain() {
         return drawingBrain;
     }
 
@@ -315,19 +314,14 @@ public class GameManager implements Serializable {
         this.enableSpikes = enableSpikes;
     }
 
-    public void startGame() {
-    }
-
     //Main computation
-    private void run() {
+    private void run(PApplet mainClass) {
         if (drawingEnabled) {
             if (mainClass.frameCount % (30) == 0) {
                 mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate));
             }
         } else {
-//            if (mainClass.frameCount % 200 == 0) {
-                mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
-//            }
+            mainClass.getSurface().setTitle("Epoch: " + epoch + " FPS: " + formatter.format(mainClass.frameRate * 100));
         }
 
         //Keyboard viewport control
@@ -351,12 +345,12 @@ public class GameManager implements Serializable {
 
         //if there are too few agents in the simulation, spawn more
         if (agents.size() < Modes.getMinimumAgentCount()) {
-            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
+            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, false));
 //            System.out.println("Population too low; adding new agent");
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
 //            System.out.println("below threshold. agent added");
         } else if (time % 72000 == 0){ //also spawn one periodically to add genetic variance to the simulation
-            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, mainClass, false));
+            agents.add(new Agent(Modes.getMinimumStartingAgentEnergy(), this, false));
             unusedEnergy -= Modes.getMinimumStartingAgentEnergy();
 //            System.out.println("periodic agent added");
         }
@@ -391,13 +385,11 @@ public class GameManager implements Serializable {
         plants.removeAll(plantsToRemove);
 
 //        agents.parallelStream().forEach(Agent::runAgent);
-        for (Agent agent : agents) {
-            agent.runAgent();
-        }
+        for (Agent agent : agents) agent.runAgent();
         agents.parallelStream().forEach(Agent::moveAgent);
 //        agents.forEach(Agent::moveAgent);
 //        for (Agent agent : agents) {
-//            agent.moveAgent();
+//            agent.moveAgent(mainClass);
 //        }
 
         ArrayList<Agent> toRemove = new ArrayList<>();
@@ -437,7 +429,7 @@ public class GameManager implements Serializable {
     }
 
     // returns total energy in the system
-    public double calculateTotalEnergy() {
+    double calculateTotalEnergy() {
         double totalEnergy = unusedEnergy;
         for (Agent agent : agents) {
             totalEnergy += agent.getEnergy();

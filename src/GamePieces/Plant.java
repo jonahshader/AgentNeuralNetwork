@@ -3,6 +3,7 @@ package GamePieces;
 import MainParts.AgentEvolution;
 import MainParts.GameManager;
 import MainParts.Modes;
+import VisionOptimisation.Section;
 import VisionOptimisation.VisionOptimiser;
 import processing.core.PApplet;
 
@@ -22,9 +23,8 @@ public class Plant implements Serializable {
     final static double BASE_COLOR_VARIANCE = 0.1f; //Percentage
     final static double MAX_GROW_RATE = 1.1;
     final static double SIZE_SCALE = 3;
-    AgentEvolution mainProgram;
     VisionOptimiser optimiser;
-    VisionOptimiser.Section containingSection;
+    Section containingSection;
     GameManager game;
     ArrayList<Plant> otherPlants;
     boolean dead = false;       //If dead, this was already killed and the energy was managed, it is safe to remove this from any and all arraylists
@@ -35,9 +35,8 @@ public class Plant implements Serializable {
     private double diameter;
     private double[] rgb;
 
-    public Plant(ArrayList<Plant> otherPlants, GameManager game, AgentEvolution mainProgram) {
+    public Plant(ArrayList<Plant> otherPlants, GameManager game) {
         this.otherPlants = otherPlants;
-        this.mainProgram = mainProgram;
         this.game = game;
         optimiser = game.optimiser;
 
@@ -78,8 +77,8 @@ public class Plant implements Serializable {
         containingSection.getPlants().add(this);
     }
 
-    public void drawPlant() {
-        if (!dead && visibleOnScreen()) {
+    public void drawPlant(PApplet mainProgram) {
+        if (!dead && visibleOnScreen(mainProgram)) {
             mainProgram.fill((float) rgb[0], (float) rgb[1], (float) rgb[2]);
             mainProgram.noStroke();
             mainProgram.ellipse((float) x, (float) y, (float) diameter, (float) diameter);
@@ -109,7 +108,7 @@ public class Plant implements Serializable {
                 updateDiameter();
                 return desiredFood;
             } else {
-                game.addPlantToAddQueue(new Plant(otherPlants, game, mainProgram));
+                game.addPlantToAddQueue(new Plant(otherPlants, game));
                 dead = true;
                 double tempFood = food;
                 food = 0;
@@ -144,9 +143,9 @@ public class Plant implements Serializable {
         diameter = (2.0 * Math.sqrt(food * SIZE_SCALE / Math.PI));
     }
 
-    private boolean visibleOnScreen() {
-        if (game.worldToScreenX(x + diameter) > 0 && game.worldToScreenX(x - diameter) < mainProgram.width) {
-            if (game.worldToScreenY(y + diameter) > 0 && game.worldToScreenY(y - diameter) < mainProgram.height) {
+    private boolean visibleOnScreen(PApplet mainProgram) {
+        if (game.worldToScreenX(x + diameter, mainProgram) > 0 && game.worldToScreenX(x - diameter, mainProgram) < mainProgram.width) {
+            if (game.worldToScreenY(y + diameter, mainProgram) > 0 && game.worldToScreenY(y - diameter, mainProgram) < mainProgram.height) {
                 return true;
             }
         }

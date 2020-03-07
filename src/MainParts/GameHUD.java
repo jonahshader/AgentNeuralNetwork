@@ -8,30 +8,28 @@ import java.io.Serializable;
 /**
  * Created by Jonah on 3/27/2017.
  */
-public class GameHUD implements Serializable {
-    final static float Y_OFFSET = 32;
-    AgentEvolution graphics;
-    GameManager game;
-    Agent spectatingAgent;
+class GameHUD implements Serializable {
+    private final static float Y_OFFSET = 32;
+    private GameManager game;
+    private Agent spectatingAgent;
 
-    public GameHUD(AgentEvolution graphics, GameManager game) {
-        this.graphics = graphics;
+    GameHUD(GameManager game) {
         this.game = game;
     }
 
-    public void drawHUD() {
+    void drawHUD(PApplet graphics) {
         graphics.textSize(24);
 
         graphics.fill(0);
         graphics.text("Agents: " + game.getAgents().size(), 9, 33);
         graphics.text("Unused Energy: " + Math.round(game.getUnusedEnergy()), 9, 33 + Y_OFFSET);
-        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 9, 33 + Y_OFFSET * 2);
+//        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 9, 33 + Y_OFFSET * 2);
         graphics.text("Force Reproduce Mode: " + (game.isForceReproduce() ? "ON" : "OFF"), 9, 33 + Y_OFFSET * 3);
 
         graphics.fill(255);
         graphics.text("Agents: " + game.getAgents().size(), 8, 32);
         graphics.text("Unused Energy: " + Math.round(game.getUnusedEnergy()), 8, 32 + Y_OFFSET);
-        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 8, 32 + Y_OFFSET * 2);
+//        graphics.text("Total Energy:   " + Math.round(game.calculateTotalEnergy()), 8, 32 + Y_OFFSET * 2);
         graphics.text("Force Reproduce Mode: " + (game.isForceReproduce() ? "ON" : "OFF"), 8, 32 + Y_OFFSET * 3);
 
         if (spectatingAgent != null) {
@@ -40,16 +38,16 @@ public class GameHUD implements Serializable {
             } else {
                 if (game.isDrawingBrain())
                     spectatingAgent.getBrain().drawNetwork(graphics, 400, 60);
-                spectatingAgent.calculateTotalEnergy(true);
+                spectatingAgent.calculateTotalEnergy(false);
             }
         }
     }
 
-    public void setSpectatingAgent(Agent spectatingAgent) {
+    void setSpectatingAgent(Agent spectatingAgent) {
         this.spectatingAgent = spectatingAgent;
     }
 
-    private void polygon(float x, float y, float radius, int npoints) {
+    private void polygon(float x, float y, float radius, int npoints, PApplet graphics) {
         float angle = PApplet.TWO_PI / npoints;
         graphics.beginShape();
         for (float a = 0; a < PApplet.TWO_PI; a += angle) {
@@ -60,7 +58,7 @@ public class GameHUD implements Serializable {
         graphics.endShape(PApplet.CLOSE);
     }
 
-    public void mousePressed() {
+    void mousePressed() {
 
     }
 }
