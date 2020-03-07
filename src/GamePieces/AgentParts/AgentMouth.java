@@ -1,7 +1,6 @@
 package GamePieces.AgentParts;
 
 import GamePieces.Agent;
-import MainParts.Environment;
 
 import java.io.Serializable;
 
@@ -12,7 +11,6 @@ import java.io.Serializable;
 //TODO: finish & implement this
 public class AgentMouth implements Serializable {
     Agent parentAgent;
-    Environment env;
     double diameter;
     double foodPreference; //Ratio of effectiveness between plant and agent. 1 = 100% effectiveness against food and 0% effectiveness against agent.
     double relativeAngle; //Angle difference from center line

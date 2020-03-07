@@ -1,14 +1,8 @@
 package VisionOptimisation;
 
-import GamePieces.Agent;
-import GamePieces.Plant;
-import GamePieces.Spike;
 import processing.core.PApplet;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-
-import static processing.core.PConstants.CORNER;
 
 /**
  * Created by Jonah on 3/26/2017.

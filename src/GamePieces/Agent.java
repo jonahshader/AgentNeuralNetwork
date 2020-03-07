@@ -120,20 +120,6 @@ public class Agent implements Serializable {
         rgb[1] = Math.random() * 255;
         rgb[2] = Math.random() * 255;
 
-        //Try to spawn agent in a location that isn't overlapping with other agents
-//        for (int i = 0; i < 2; i++) {
-//            boolean emptySpace = true;
-//            x = (Math.random() * Modes.getWorldWidth());
-//            y = (Math.random() * Modes.getWorldHeight());
-//
-//            for (Agent agent : otherAgents) {
-//                if (PApplet.dist((float) x, (float) y, (float) agent.getX(), (float) agent.getY()) < (agent.getDiameter() / 2) + (diameter / 2)) {
-//                    emptySpace = false;
-//                }
-//            }
-//            if (emptySpace) break; //This coordinate works. break loop
-//        }
-
         x = (Math.random() * Modes.getWorldWidth());
         y = (Math.random() * Modes.getWorldHeight());
 
@@ -172,9 +158,6 @@ public class Agent implements Serializable {
         pDirection = direction;
         deltaDirection = 0;
         health = 100;
-//        System.out.println("Baby Created, mutation rate: " + mutationRate);
-//        System.out.println("Baby Created");
-//        brain.printDebug();
 
         speed = parentAgent.speed;
         targetSpeed = parentAgent.targetSpeed;
@@ -300,7 +283,6 @@ public class Agent implements Serializable {
                         }
                     }
                 }
-//            } else {    //If the agent isn't trying to eat, just calculate collision detection
             }
             for (Plant plant : otherPlants) {
                 if (PApplet.dist((float) x, (float) y, (float) plant.getX(), (float) plant.getY()) < (plant.getDiameter() / 2.0) + (diameter / 2.0)) {
@@ -512,18 +494,15 @@ public class Agent implements Serializable {
 
         //Send data to brain
         for (int i = 0; i < eyes.length; i++)
-            brain.setInput(i, Math.pow(Math.max(((EYE_LENGTH - eyes[i].getItemDistance()) / EYE_LENGTH) * GameManager.environment.getVisibility(), 0), 1.0));
-//            brain.setInput(i, 500 / (eyes[i].getItemDistance()) + 50);
+            brain.setInput(i, Math.pow(Math.max(((EYE_LENGTH - eyes[i].getItemDistance()) / EYE_LENGTH), 0), 1.0));
         for (int i = eyes.length; i < 2 * eyes.length; i++)
-            brain.setInput(i, Math.max(0, Math.min(1, eyes[i - eyes.length].getItemRgbData()[0] / 255.0)) * GameManager.environment.getVisibility() * 5);
+            brain.setInput(i, Math.max(0, Math.min(1, eyes[i - eyes.length].getItemRgbData()[0] / 255.0)) * 5);
         for (int i = 2 * eyes.length; i < 3 * eyes.length; i++)
-            brain.setInput(i, Math.max(0, Math.min(1, eyes[i - (2 * eyes.length)].getItemRgbData()[1] / 255.0)) * GameManager.environment.getVisibility() * 5);
-//            brain.setInput(i, eyes[i - (2 * eyes.length)].getItemRgbData()[1] / 255);
+            brain.setInput(i, Math.max(0, Math.min(1, eyes[i - (2 * eyes.length)].getItemRgbData()[1] / 255.0)) * 5);
         for (int i = 3 * eyes.length; i < 4 * eyes.length; i++)
-            brain.setInput(i, Math.max(0, Math.min(1, eyes[i - (3 * eyes.length)].getItemRgbData()[2] / 255.0)) * GameManager.environment.getVisibility() * 5);
-//            brain.setInput(i, eyes[i - (3 * eyes.length)].getItemRgbData()[2] / 255);
+            brain.setInput(i, Math.max(0, Math.min(1, eyes[i - (3 * eyes.length)].getItemRgbData()[2] / 255.0)) * 5);
         for (int i = 4 * eyes.length; i < 5 * eyes.length; i++)
-            brain.setInput(i, (eyes[i - (4 * eyes.length)].getItemDiameter() / 750.0) * GameManager.environment.getVisibility());
+            brain.setInput(i, (eyes[i - (4 * eyes.length)].getItemDiameter() / 750.0));
 
         brain.setInput(5 * eyes.length + 0, health / 100);
         brain.setInput(5 * eyes.length + 1, energy / 1200);
@@ -532,7 +511,6 @@ public class Agent implements Serializable {
         brain.setInput(5 * eyes.length + 4, colliding ? 1 : 0);
         brain.setInput(5 * eyes.length + 5, Math.cos(direction));
         brain.setInput(5 * eyes.length + 6, Math.sin(direction));
-//        brain.setInput(5 * eyes.length + 823, Math.random() - 0.5);
 
         //Update brain
         brain.calculateNet();
@@ -541,9 +519,6 @@ public class Agent implements Serializable {
     private void controlOutputsWithBrain() {
         directionChangeSpeed = brain.getOutput(0) / (Math.PI * 4);
         speed = (brain.getOutput(1) * 3);
-//        rgb[0] = (brain.getOutput(2) + 0.5) * 255;
-//        rgb[1] = ((brain.getOutput(3) + 0.5) * 255);
-//        rgb[2] = ((brain.getOutput(4) + 0.5) * 255);
         rgb[0] = (brain.getOutput(2)) * 255;
         rgb[1] = ((brain.getOutput(3)) * 255);
         rgb[2] = ((brain.getOutput(4)) * 255);
@@ -567,16 +542,8 @@ public class Agent implements Serializable {
             energy /= 3.0f;
             game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
             game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
-//            game.addAgentToAddQueue(new Agent(energy, this, true, mutationRate, false, false));
-//            System.out.println("Child created at age " + age);
-//            energy = 0;
-//            killAgent();
         }
     }
-
-//    public void dumpEnergy() {
-//        energy = 0;
-//    }
 
     public boolean isDead() {
         return dead;

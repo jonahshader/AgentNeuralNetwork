@@ -29,7 +29,6 @@ public class GameManager implements Serializable {
     private ArrayList<Spike> spikesToAdd;
 
     public VisionOptimiser optimiser;
-    public static Environment environment;
     private GameHUD hud;
 
     private boolean drawingEnabled = true;
@@ -64,7 +63,6 @@ public class GameManager implements Serializable {
         //Init HUD for displaying some data
         hud = new GameHUD(this);
         //Create the environment (controls day/night cycle)
-        environment = new Environment();
         //Create the optimiser object
         optimiser = new VisionOptimiser(Modes.getWorldWidth(), Modes.getWorldHeight());
         //init arraylists
@@ -117,11 +115,11 @@ public class GameManager implements Serializable {
 
         //Apply viewport translation
         mainClass.pushMatrix();
-        mainClass.translate(mainClass.width / 2, mainClass.height / 2);
+        mainClass.translate(mainClass.width / 2f, mainClass.height / 2f);
         mainClass.scale((float) viewportZoom);
-        mainClass.translate( -mainClass.width / 2, -mainClass.height / 2);
+        mainClass.translate( -mainClass.width / 2f, -mainClass.height / 2f);
         mainClass.translate((float) -viewportX, (float) -viewportY);
-        mainClass.background(environment.getBrightness());
+        mainClass.background(0);
         if (drawingDebugGraphics)
             optimiser.drawDebug(mainClass);
 
@@ -340,7 +338,7 @@ public class GameManager implements Serializable {
             }
         }
 
-        if (time % 50 == 0)
+        if (time % 20 == 0)
             optimiser.runOptimiser();
 
         //if there are too few agents in the simulation, spawn more
@@ -424,7 +422,6 @@ public class GameManager implements Serializable {
             spikesToAdd.clear();
         }
 
-        environment.calculateEnvironment(time);
         time++;
     }
 

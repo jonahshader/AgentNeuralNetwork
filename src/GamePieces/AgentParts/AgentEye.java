@@ -3,7 +3,6 @@ package GamePieces.AgentParts;
 import GamePieces.Agent;
 import GamePieces.Plant;
 import GamePieces.Spike;
-import MainParts.Environment;
 import MainParts.GameManager;
 import processing.core.PApplet;
 
@@ -18,7 +17,6 @@ import static GamePieces.Agent.EYE_LENGTH;
  */
 public class AgentEye implements Serializable {
     private Agent parentAgent;
-    private Environment env;
     private Line2D eyeLine;
     private GameManager game;
     private double relativeAngle;    //Angle difference from center line
@@ -30,7 +28,6 @@ public class AgentEye implements Serializable {
 
     public AgentEye(Agent parentAgent, double relativeAngle, GameManager game) {
         this.parentAgent = parentAgent;
-        this.env = GameManager.environment; //TODO: make environment not static
         this.relativeAngle = relativeAngle;
         this.game = game;
         itemRgbData = new double[3];
@@ -47,10 +44,6 @@ public class AgentEye implements Serializable {
             if (agent != parentAgent) {
                 if (eyeLine.ptSegDist(agent.getX(), agent.getY()) < agent.getDiameter() / 2) {  //Circle collided, it is visible to this eye
                     float tempDistance = PApplet.dist((float) parentAgent.getX(), (float) parentAgent.getY(), (float) agent.getX(), (float) agent.getY());
-
-//                    //EXPERIMENTAL CODE BELOW
-//                    tempDistance -= (agent.getDiameter() / 2.0);
-//                    if (tempDistance < 0) tempDistance = 0;
 
                     if (tempDistance < shortestDistance) {
                         closestAgent = agent;
@@ -98,9 +91,9 @@ public class AgentEye implements Serializable {
             itemRgbData = closestSpike.getRgb().clone();
         } else {
             itemDiameter = 0;
-            itemRgbData[0] = env.getBrightness();
-            itemRgbData[1] = env.getBrightness();
-            itemRgbData[2] = env.getBrightness();
+            itemRgbData[0] = 0;
+            itemRgbData[1] = 0;
+            itemRgbData[2] = 0;
         }
     }
 
