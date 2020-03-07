@@ -385,8 +385,8 @@ public class GameManager implements Serializable {
         plants.removeAll(plantsToRemove);
 
 //        agents.parallelStream().forEach(Agent::runAgent);
-        for (Agent agent : agents) agent.runAgent();
-        agents.parallelStream().forEach(Agent::moveAgent);
+        for (Agent agent : agents) agent.runAgent(mainClass);
+        agents.parallelStream().forEach(agent -> agent.moveAgent(mainClass));
 //        agents.forEach(Agent::moveAgent);
 //        for (Agent agent : agents) {
 //            agent.moveAgent(mainClass);

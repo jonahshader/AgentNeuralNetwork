@@ -49,11 +49,6 @@ public class Agent implements Serializable {
     private final static int MISC_INPUT_COUNT = 7;
     //red, green, blue, speed, direction change, eat, reproduce
     private final static int MISC_OUTPUT_COUNT = 7;
-    private static int screenWidth;
-    private static int screenHeight;
-    private static int mouseX;
-    private static int mouseY;
-    private static float frameRate;
     //private int totalInputs = 33; //MISC_INPUT_COUNT + (EYE_COUNT * 5)
     private int[] hiddenLayers = new int[]{45, 20, 13};
 
@@ -224,15 +219,7 @@ public class Agent implements Serializable {
         }
     }
 
-    public static void updateDisplayParameters(PApplet graphics) {
-        screenWidth = graphics.width;
-        screenHeight = graphics.height;
-        mouseX = graphics.mouseX;
-        mouseY = graphics.mouseY;
-        frameRate = graphics.frameRate;
-    }
-
-    public void moveAgent() {
+    public void moveAgent(PApplet graphics) {
         checkDead();
         if (!dead) {
             updateDiameter();
@@ -250,8 +237,8 @@ public class Agent implements Serializable {
             checkDead();
 
             if (playerControl || spectating) {
-                game.setViewportX(x - (screenWidth / 2));
-                game.setViewportY(y - (screenHeight / 2));
+                game.setViewportX(x - (graphics.width / 2f));
+                game.setViewportY(y - (graphics.height / 2f));
             }
 
             updateSensorLocations();
@@ -259,7 +246,7 @@ public class Agent implements Serializable {
         }
     }
 
-    public void runAgent() {
+    public void runAgent(PApplet graphics) {
         checkContainingSection();
         updateVisibleItems();
         if (!dead) {
@@ -273,8 +260,8 @@ public class Agent implements Serializable {
             if (playerControl) {
                 reproduce = false;
                 eat = true;
-                direction = Math.atan2(game.screenToWorldY(mouseY, screenHeight) - y, game.screenToWorldX(mouseX, screenWidth) - x);
-                speed = PApplet.dist((float) x, (float) y, (float) game.screenToWorldX(mouseX, screenWidth), (float) game.screenToWorldY(mouseY, screenHeight)) / (frameRate * 0.1);
+                direction = Math.atan2(game.screenToWorldY(graphics.mouseY, graphics.height) - y, game.screenToWorldX(graphics.mouseX, graphics.width) - x);
+                speed = PApplet.dist((float) x, (float) y, (float) game.screenToWorldX(graphics.mouseX, graphics.width), (float) game.screenToWorldY(graphics.mouseY, graphics.height)) / (graphics.frameRate * 0.1);
             } else {
                 controlOutputsWithBrain();
             }
