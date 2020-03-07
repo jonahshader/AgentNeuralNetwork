@@ -52,7 +52,7 @@ public class GameManager implements Serializable {
     GameManager(PApplet mainClass) {
         Modes.setScale(1.0f); //0.6
         //uncomment for carnivore mode
-//        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
+        Modes.setDifficultyMode(Modes.Mode.NO_PLANTS);
 //        Modes.disableSpikes();
 
         //Determine initial energy the simulation will have based on the number of agents, agent starting energy, and a multiplier (energy boost scale)
